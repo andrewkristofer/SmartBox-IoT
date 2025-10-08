@@ -21,7 +21,7 @@
 #include <WiFi.h>
 #include <PubSubClient.h>   // MQTT Communication
 #include <DHT.h>            // Temperature & Humidity Sensor
-#include <TinyGPS++.h>       // GPS Data Parsing
+#include <TinyGPS++.h>      // GPS Data Parsing
 #include <HardwareSerial.h> // ESP32 Hardware Serial
 
 //==============================================================================
@@ -43,7 +43,7 @@ const long PUBLISH_INTERVAL_MS = 30000; ///< @brief Data publishing interval (30
 //==============================================================================
 // SECTION 3: HARDWARE PIN DEFINITIONS
 //==============================================================================
-#define DHT_PIN 4        ///< @brief Pin connected to the DHT22 data line.
+#define DHT_PIN 4        ///< @brief Pin connected to the DHT11 data line.
 #define GPS_RX_PIN 16    ///< @brief ESP32 RX pin, connected to GPS TX.
 #define GPS_TX_PIN 17    ///< @brief ESP32 TX pin, connected to GPS RX.
 #define LED_GREEN_PIN 25 ///< @brief Pin for the green status LED (safe condition).
@@ -56,7 +56,7 @@ const long PUBLISH_INTERVAL_MS = 30000; ///< @brief Data publishing interval (30
 //==============================================================================
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
-DHT dht(DHT_PIN, DHT22);
+DHT dht(DHT_PIN, DHT11);
 TinyGPSPlus gps;
 HardwareSerial gpsSerial(2); // Use UART2 on ESP32
 
