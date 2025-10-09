@@ -2,7 +2,7 @@
  * @file smartBox_Firmware.ino
  * @author Kelompok 11 - Universitas Indonesia
  * @brief Firmware for the Smart Box IoT device to monitor and transmit environmental data.
- * @version 1.0.1 (Compiler Fix)
+ * @version 1.0.2 (Syntax-Cutted Fix)
  * @date 2025-10-08
  *
  * @copyright Copyright (c) 2025
