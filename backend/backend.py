@@ -22,6 +22,7 @@ import time
 from threading import Thread
 import paho.mqtt.client as mqtt
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import os
 
 # ==============================================================================
@@ -147,6 +148,7 @@ def start_mqtt_listener():
 # SECTION 5: API SERVER (FLASK)
 # ==============================================================================
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/api/data/<string:box_id>', methods=['GET'])
 def get_data_by_box_id(box_id: str):
