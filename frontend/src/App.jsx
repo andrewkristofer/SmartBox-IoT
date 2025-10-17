@@ -1,53 +1,187 @@
-import { useState, useEffect, useRef } from 'react'
-import { Menu, X, Leaf, Heart, Users, Award } from 'lucide-react'
-import './App.css'
+import { useState, useEffect, useRef } from 'react';
+import SmartBoxLogo from './assets/smartboxiotlogo.png'; // Pastikan path-nya benar
+import { Menu, X, Leaf, Heart, Users, Award, Thermometer, Droplets, MapPin, Clock } from 'lucide-react';
+import './App.css';
+
+const SmartBoxDataDisplay = () => {
+  const [smartBoxData, setSmartBoxData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef(null);
+
+  const boxIdToFetch = 'SMARTBOX-001';
+
+  const getLogStatus = (log) => {
+    if (!log || typeof log.temperature !== 'number' || typeof log.humidity !== 'number') {
+      return { text: 'N/A', className: 'status-unknown' };
+    }
+    
+    const isTempSafe = log.temperature >= 1.0 && log.temperature <= 4.0;
+    const isHumidSafe = log.humidity >= 40.0 && log.humidity <= 60.0;
+
+    if (isTempSafe && isHumidSafe) {
+      return { text: 'Aman', className: 'status-safe' };
+    } else {
+      return { text: 'Bahaya', className: 'status-danger' };
+    }
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        } else {
+          setIsVisible(false);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`http://localhost:5000/api/data/${boxIdToFetch}?limit=6`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setSmartBoxData(data);
+      } catch (e) {
+        setError("Gagal mengambil data dari backend. Pastikan server backend berjalan.");
+        console.error("Fetch error:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 10000);
+
+    return () => clearInterval(interval);
+  }, [boxIdToFetch]);
+
+  return (
+    <div ref={containerRef} className={`live-data-container ${isVisible ? 'visible' : ''}`}>
+      <h3 className="live-data-title">
+        Live Data Feed (ID: {boxIdToFetch})
+        <div className="live-indicator"></div>
+      </h3>
+      {isLoading && <p>Loading data...</p>}
+      {error && <p className="error-message">{error}</p>}
+      {!isLoading && !error && (
+        smartBoxData.length > 0 ? (
+          <div className="data-cards-grid">
+            {smartBoxData.map((log, index) => {
+              const status = getLogStatus(log);
+              const gmapsUrl = `https://www.google.com/maps?q=${log.latitude},${log.longitude}`;
+
+              return (
+                <div 
+                  key={log.id} 
+                  className={`data-card ${isVisible ? 'visible' : ''}`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className={`status-indicator ${status.className}`}>
+                    {status.text}
+                  </div>
+                  
+                  <div className="data-item">
+                    <Clock size={16} /> <span>{new Date(log.timestamp).toLocaleString('id-ID')}</span>
+                  </div>
+                  <div className="data-item">
+                    <Thermometer size={16} /> <span>{log.temperature?.toFixed(2)} °C</span>
+                  </div>
+                  <div className="data-item">
+                    <Droplets size={16} /> <span>{log.humidity?.toFixed(2)} %</span>
+                  </div>
+                  
+                  <a href={gmapsUrl} target="_blank" rel="noopener noreferrer" className="data-item-link">
+                    <div className="data-item">
+                      <MapPin size={16} /> <span>{log.latitude?.toFixed(4)}, {log.longitude?.toFixed(4)}</span>
+                    </div>
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p>Belum ada data yang diterima. Pastikan firmware berjalan dan mengirim data.</p>
+        )
+      )}
+    </div>
+  );
+};
 
 function App() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isHeaderScrolled, setIsHeaderScrolled] = useState(false)
-  const [visibleSections, setVisibleSections] = useState(new Set())
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
+  const [visibleSections, setVisibleSections] = useState(new Set());
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [dashboardStats, setDashboardStats] = useState({
     mealsProvided: 0,
     co2Saved: 0,
     peopleHelped: 0,
     volunteers: 0
-  })
+  });
 
-  const sectionsRef = useRef({})
+  const sectionsRef = useRef({});
 
-  // Handle scroll effects
+  // Handle scroll effects with progress bar
   useEffect(() => {
     const handleScroll = () => {
-      setIsHeaderScrolled(window.scrollY > 100)
-    }
+      setIsHeaderScrolled(window.scrollY > 100);
+      
+      // Calculate scroll progress
+      const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (window.scrollY / windowHeight) * 100;
+      setScrollProgress(scrolled);
+    };
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Intersection Observer for animations
+  // Enhanced Intersection Observer with staggered animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setVisibleSections(prev => new Set([...prev, entry.target.id]))
+            setVisibleSections(prev => new Set([...prev, entry.target.id]));
             
             if (entry.target.id === 'dashboard') {
-              animateDashboard()
+              animateDashboard();
             }
+          } else {
+            // Remove the section from visible set when it leaves viewport
+            setVisibleSections(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(entry.target.id);
+              return newSet;
+            });
           }
-        })
+        });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-    )
+      { threshold: 0.15, rootMargin: '0px 0px -100px 0px' }
+    );
 
     Object.values(sectionsRef.current).forEach(ref => {
-      if (ref) observer.observe(ref)
-    })
+      if (ref) observer.observe(ref);
+    });
 
-    return () => observer.disconnect()
-  }, [])
+    return () => observer.disconnect();
+  }, []);
 
   // Animate dashboard counters
   const animateDashboard = () => {
@@ -56,56 +190,58 @@ function App() {
       co2Saved: 892,
       peopleHelped: 5432,
       volunteers: 234
-    }
+    };
 
     Object.entries(targets).forEach(([key, target]) => {
-      const duration = 2000
-      const increment = target / (duration / 16)
-      let current = 0
+      const duration = 2000;
+      const increment = target / (duration / 16);
+      let current = 0;
 
       const timer = setInterval(() => {
-        current += increment
+        current += increment;
         if (current >= target) {
-          current = target
-          clearInterval(timer)
+          current = target;
+          clearInterval(timer);
         }
-        setDashboardStats(prev => ({ ...prev, [key]: Math.floor(current) }))
-      }, 16)
-    })
-  }
+        setDashboardStats(prev => ({ ...prev, [key]: Math.floor(current) }));
+      }, 16);
+    });
+  };
 
   const scrollToSection = (sectionId) => {
-    const element = sectionsRef.current[sectionId]
+    const element = sectionsRef.current[sectionId];
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' })
-      setIsMenuOpen(false)
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setIsMenuOpen(false);
     }
-  }
+  };
 
   const handleJoinProgram = () => {
-    alert('Terima kasih atas minat Anda! Fitur pendaftaran akan segera tersedia.')
-  }
+    alert('Terima kasih atas minat Anda! Fitur pendaftaran akan segera tersedia.');
+  };
 
   const handleDonate = () => {
-    alert('Terima kasih atas niat baik Anda! Sistem donasi sedang dalam pengembangan.')
-  }
+    alert('Terima kasih atas niat baik Anda! Sistem donasi sedang dalam pengembangan.');
+  };
 
   return (
     <div className="app-container">
+      {/* Scroll Progress Bar */}
+      <div className="scroll-progress-bar" style={{ width: `${scrollProgress}%` }}></div>
+
       {/* Navigation */}
       <header className={`header ${isHeaderScrolled ? 'scrolled' : ''}`}>
         <nav className="nav">
           <div className="logo">
-            <Leaf className="logo-icon" />
-            <span>MBG</span>
+            <img src={SmartBoxLogo} alt="Smart Box IoT Logo" className="logo-icon" />
+            <span>Smart Box IoT</span>
           </div>
           
           <ul className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
             {[
-              { id: 'home', label: 'Beranda' },
-              { id: 'program', label: 'Program' },
-              { id: 'nutrition', label: 'Nutrisi' },
-              { id: 'impact', label: 'Dampak Hijau' },
+              { id: 'home', label: 'What' },
+              { id: 'program', label: 'Why' },
+              { id: 'nutrition', label: 'How' },
               { id: 'dashboard', label: 'Dashboard' }
             ].map(item => (
               <li key={item.id}>
@@ -126,29 +262,25 @@ function App() {
       <section id="home" ref={el => sectionsRef.current.home = el} className="hero">
         <div className="hero-bg"></div>
         <div className="hero-content">
-          <h1 className="animate-slide-up">Makan Bergizi Gratis</h1>
+          <h1 className="animate-slide-up">Smart Box IoT</h1>
           <div className="tagline animate-slide-up delay-200">
-            Healthy Generation, Green Earth
+            Smart Monitoring for Nutritious Distribution
           </div>
           <p className="animate-slide-up delay-400">
-            Bergabunglah dengan gerakan untuk menyediakan makanan bergizi gratis sambil menjaga 
-            kelestarian lingkungan. Bersama kita ciptakan generasi sehat dan bumi yang hijau.
+            Smart Box IoT adalah sistem monitoring cerdas yang memantau dan menjaga suhu, kelembaban, dan lokasi bahan pangan.
+            Dirancang untuk mendukung Program Makan Bergizi Gratis agar kualitas bahan pangan tetap terjaga sepanjang proses distribusi.
           </p>
-          <div className="cta-buttons animate-slide-up delay-600">
-            <button onClick={() => scrollToSection('program')} className="btn btn-primary">
-              Pelajari Program
-            </button>
-            <button onClick={() => scrollToSection('dashboard')} className="btn btn-secondary">
-              Mulai Berkontribusi
-            </button>
-          </div>
         </div>
       </section>
 
       {/* Program Section */}
-      <section id="program" ref={el => sectionsRef.current.program = el} className="section program">
-        <h2 className="section-title">
-          Tentang Program MBG
+      <section 
+        id="program" 
+        ref={el => sectionsRef.current.program = el} 
+        className={`section program ${visibleSections.has('program') ? 'section-visible' : ''}`}
+      >
+        <h2 className={`section-title ${visibleSections.has('program') ? 'title-visible' : ''}`}>
+          Why Smart Box IoT?
           <div className="title-underline"></div>
         </h2>
         
@@ -156,24 +288,24 @@ function App() {
           {[
             {
               icon: <Heart />,
-              title: "Apa itu MBG?",
-              content: "Makan Bergizi Gratis (MBG) adalah program yang menyediakan makanan sehat dan bergizi secara gratis untuk masyarakat yang membutuhkan, sambil mempromosikan pola makan berkelanjutan yang ramah lingkungan."
+              title: "Monitoring System",
+              content: "Smart Box IoT memanfaatkan sensor untuk memantau suhu dan kelembaban bahan pangan secara real-time guna menjaga kualitas selama distribusi dan penyimpanan."
             },
             {
               icon: <Users />,
-              title: "Cara Berkontribusi",
-              content: "Anda dapat berkontribusi melalui donasi, menjadi volunteer, atau menyebarkan kesadaran tentang pentingnya nutrisi dan keberlanjutan lingkungan. Setiap kontribusi sekecil apapun sangat berarti."
+              title: "Connected and Efficient",
+              content: "Terintegrasi dengan GPS dan dashboard berbasis web yang hanya dapat diakses oleh admin terverifikasi, memastikan pengawasan distribusi berjalan efisien dan terkontrol."
             },
             {
               icon: <Leaf />,
-              title: "Dampak Sosial",
-              content: "Program ini tidak hanya membantu mengatasi kelaparan, tetapi juga mendidik masyarakat tentang pilihan makanan yang sehat dan ramah lingkungan untuk masa depan yang berkelanjutan."
+              title: "Responsive and Secure",
+              content: "Sistem mengirim notifikasi otomatis saat terjadi perubahan suhu atau kelembaban di luar batas normal, membantu petugas mengambil tindakan cepat agar pangan tetap layak konsumsi."
             }
           ].map((item, index) => (
             <div
               key={index}
               className={`info-card ${visibleSections.has('program') ? 'visible' : ''}`}
-              style={{ animationDelay: `${index * 200}ms` }}
+              style={{ animationDelay: `${index * 150}ms` }}
             >
               <div className="card-icon">{item.icon}</div>
               <h3>{item.title}</h3>
@@ -184,18 +316,21 @@ function App() {
       </section>
 
       {/* Nutrition Section */}
-      <section id="nutrition" ref={el => sectionsRef.current.nutrition = el} className="section nutrition">
-        <h2 className="section-title">
-          Nutrisi & Edukasi
+      <section 
+        id="nutrition" 
+        ref={el => sectionsRef.current.nutrition = el} 
+        className={`section nutrition ${visibleSections.has('nutrition') ? 'section-visible' : ''}`}
+      >
+        <h2 className={`section-title ${visibleSections.has('nutrition') ? 'title-visible' : ''}`}>
+          How Smart Box IoT Improves Food Distribution and Storage
           <div className="title-underline"></div>
         </h2>
         
         <div className="features-grid">
           {[
-            { emoji: "🥬", title: "Sayuran Organik", desc: "Promosi konsumsi sayuran organik lokal yang kaya nutrisi dan ramah lingkungan" },
-            { emoji: "🍎", title: "Buah-buahan Segar", desc: "Edukasi tentang manfaat buah-buahan segar untuk kesehatan dan kebugaran optimal" },
-            { emoji: "🌾", title: "Biji-bijian Utuh", desc: "Pentingnya biji-bijian utuh sebagai sumber karbohidrat sehat dan berkelanjutan" },
-            { emoji: "🥜", title: "Protein Nabati", desc: "Promosi protein nabati yang lebih ramah lingkungan dibanding protein hewani" }
+            { emoji: "📦", title: "Maintains Food Quality", desc: "Sensor suhu dan kelembaban memastikan bahan makanan tetap dalam kondisi optimal selama penyimpanan dan perjalanan distribusi." },
+            { emoji: "🛡️", title: "Reduces Risk of Damage", desc: "Sistem memberikan peringatan dini jika kondisi penyimpanan tidak sesuai, memungkinkan tindakan cepat untuk mencegah kerusakan atau pemborosan pangan." },
+            { emoji: "🚚", title: "Enhances Delivery Efficiency", desc: "Pelacakan GPS membantu memantau posisi dan waktu pengiriman secara langsung, sehingga proses distribusi dapat dikelola dengan lebih tepat dan cepat." },
           ].map((item, index) => (
             <div
               key={index}
@@ -210,38 +345,13 @@ function App() {
         </div>
       </section>
 
-      {/* Green Impact Section */}
-      <section id="impact" ref={el => sectionsRef.current.impact = el} className="section impact">
-        <h2 className="section-title">
-          Dampak Hijau
-          <div className="title-underline"></div>
-        </h2>
-        
-        <div className="impact-content">
-          <div className={`impact-text ${visibleSections.has('impact') ? 'visible' : ''}`}>
-            <h3>Diet Sehat = Bumi Sehat</h3>
-            <p>
-              Pola makan bergizi yang berfokus pada makanan nabati tidak hanya baik untuk kesehatan tubuh, 
-              tetapi juga mengurangi jejak karbon hingga 70%. Dengan memilih makanan lokal dan organik, 
-              kita membantu mengurangi emisi gas rumah kaca dan mendukung pertanian berkelanjutan.
-            </p>
-            <ul>
-              <li>Mengurangi jejak karbon hingga 70%</li>
-              <li>Mendukung pertanian berkelanjutan</li>
-              <li>Mengurangi penggunaan pestisida</li>
-              <li>Menghemat sumber daya air</li>
-            </ul>
-          </div>
-          <div className={`impact-visual ${visibleSections.has('impact') ? 'visible' : ''}`}>
-            <div className="plant-icon">🌱</div>
-            <p className="impact-label">Sustainable Future</p>
-          </div>
-        </div>
-      </section>
-
       {/* Dashboard Section */}
-      <section id="dashboard" ref={el => sectionsRef.current.dashboard = el} className="section dashboard">
-        <h2 className="section-title">
+      <section 
+        id="dashboard" 
+        ref={el => sectionsRef.current.dashboard = el} 
+        className={`section dashboard ${visibleSections.has('dashboard') ? 'section-visible' : ''}`}
+      >
+        <h2 className={`section-title ${visibleSections.has('dashboard') ? 'title-visible' : ''}`}>
           Dashboard Kontribusi
           <div className="title-underline"></div>
         </h2>
@@ -266,20 +376,8 @@ function App() {
             </div>
           ))}
         </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="cta-section">
-        <h2>Mari Bergabung dengan Gerakan MBG!</h2>
-        <p>Bersama kita wujudkan generasi sehat dan bumi hijau untuk masa depan yang lebih baik</p>
-        <div className="cta-buttons">
-          <button onClick={handleJoinProgram} className="btn btn-primary">
-            Bergabung Sekarang
-          </button>
-          <button onClick={handleDonate} className="btn btn-secondary">
-            Donasi
-          </button>
-        </div>
+        <SmartBoxDataDisplay />
       </section>
 
       {/* Footer */}
@@ -289,7 +387,6 @@ function App() {
             { id: 'home', label: 'Beranda' },
             { id: 'program', label: 'Program' },
             { id: 'nutrition', label: 'Nutrisi' },
-            { id: 'impact', label: 'Dampak Hijau' },
             { id: 'dashboard', label: 'Dashboard' }
           ].map(item => (
             <button key={item.id} onClick={() => scrollToSection(item.id)}>
@@ -300,7 +397,7 @@ function App() {
         <p>&copy; 2025 Makan Bergizi Gratis (MBG). Healthy Generation, Green Earth.</p>
       </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

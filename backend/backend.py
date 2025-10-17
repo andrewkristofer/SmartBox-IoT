@@ -2,7 +2,7 @@
 Backend server for the Smart Box IoT project.
 
 Author: Kelompok 11 - Universitas Indonesia
-Version: 1.0
+Version: 1.1 (Portable DB Path)
 Date: 2025-10
 
 This script performs two main functions:
@@ -22,6 +22,8 @@ import time
 from threading import Thread
 import paho.mqtt.client as mqtt
 from flask import Flask, jsonify, request
+from flask_cors import CORS
+import os
 
 # ==============================================================================
 # SECTION 2: CONFIGURATION
@@ -29,8 +31,10 @@ from flask import Flask, jsonify, request
 MQTT_BROKER = "broker.hivemq.com"
 MQTT_PORT = 1883
 MQTT_TOPIC = "smartbox/kelompok11/data"  # Must match the firmware topic
-DB_FILE = "smartbox_data.db"
 API_PORT = 5000
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+DB_FILE = os.path.join(script_dir, "smartbox_data.db")
 
 # ==============================================================================
 # SECTION 3: DATABASE MANAGEMENT
@@ -144,6 +148,7 @@ def start_mqtt_listener():
 # SECTION 5: API SERVER (FLASK)
 # ==============================================================================
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/api/data/<string:box_id>', methods=['GET'])
 def get_data_by_box_id(box_id: str):

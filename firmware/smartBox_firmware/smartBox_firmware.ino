@@ -1,9 +1,9 @@
 /**
- * @file smartBox_firmware.ino
+ * @file smartBox_Firmware.ino
  * @author Kelompok 11 - Universitas Indonesia
  * @brief Firmware for the Smart Box IoT device to monitor and transmit environmental data.
- * @version 1.0
- * @date 2025-10
+ * @version 1.0.2 (Syntax-Cutted Fix)
+ * @date 2025-10-08
  *
  * @copyright Copyright (c) 2025
  *
@@ -28,8 +28,8 @@
 // SECTION 2: CONFIGURATION
 //==============================================================================
 // --- Wi-Fi Credentials ---
-const char* WIFI_SSID = "[NAMA_WIFI_ANDA]";     ///< @brief Your network SSID (name).
-const char* WIFI_PASS = "[PASSWORD_WIFI_ANDA]"; ///< @brief Your network password.
+const char* WIFI_SSID = "NAMA_WIFI_ANDA";     ///< @brief Your network SSID (name).
+const char* WIFI_PASS = "PASSWORD_WIFI_ANDA"; ///< @brief Your network password.
 
 // --- MQTT Broker Configuration ---
 const char* MQTT_BROKER = "broker.hivemq.com";        ///< @brief Public MQTT broker for testing.
@@ -43,7 +43,7 @@ const long PUBLISH_INTERVAL_MS = 30000; ///< @brief Data publishing interval (30
 //==============================================================================
 // SECTION 3: HARDWARE PIN DEFINITIONS
 //==============================================================================
-#define DHT_PIN 4        ///< @brief Pin connected to the DHT22 data line.
+#define DHT_PIN 4        ///< @brief Pin connected to the DHT11 data line.
 #define GPS_RX_PIN 16    ///< @brief ESP32 RX pin, connected to GPS TX.
 #define GPS_TX_PIN 17    ///< @brief ESP32 TX pin, connected to GPS RX.
 #define LED_GREEN_PIN 25 ///< @brief Pin for the green status LED (safe condition).
@@ -56,11 +56,21 @@ const long PUBLISH_INTERVAL_MS = 30000; ///< @brief Data publishing interval (30
 //==============================================================================
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
-DHT dht(DHT_PIN, DHT22);
-TinyGPSPlus gps;
+DHT dht(DHT_PIN, DHT11);
 HardwareSerial gpsSerial(2); // Use UART2 on ESP32
+TinyGPSPlus gps;
 
 unsigned long lastPublishTime = 0;
+
+//==============================================================================
+// SECTION 4.5 - FUNCTION PROTOTYPES
+//==============================================================================
+void setupWifi();
+void reconnectMqtt();
+void readSensors(float &temp, float &hum, float &lat, float &lon);
+void processConditions(float temp, float hum);
+void publishData(float temp, float hum, float lat, float lon);
+
 
 //==============================================================================
 // SECTION 5: CORE FUNCTIONS
@@ -173,3 +183,57 @@ void readSensors(float &temp, float &hum, float &lat, float &lon) {
     
     if (gps.location.isValid()) {
         lat = gps.location.lat();
+        lon = gps.location.lng();
+    } else {
+        lat = 0.0; lon = 0.0;
+    }
+} 
+
+/**
+ * @brief Evaluates sensor data against predefined thresholds and controls actuators.
+ * @param temp The current temperature in Celsius.
+ * @param hum The current relative humidity in percent.
+ */
+void processConditions(float temp, float hum) {
+    bool isTempSafe = (temp >= 1.0 && temp <= 4.0);
+    bool isHumidSafe = (hum >= 40.0 && hum <= 60.0);
+
+    if (isTempSafe && isHumidSafe) {
+        digitalWrite(LED_GREEN_PIN, HIGH);
+        digitalWrite(LED_RED_PIN, LOW);
+        digitalWrite(BUZZER_PIN, LOW);
+    } else {
+        digitalWrite(LED_GREEN_PIN, LOW);
+        digitalWrite(LED_RED_PIN, HIGH);
+        digitalWrite(BUZZER_PIN, HIGH);
+        Serial.println("WARNING: Conditions are outside safe limits!");
+    }
+
+    // Automatic Cooler Control
+    if (temp > 4.0) {
+        digitalWrite(PELTIER_PIN, HIGH); // Turn cooler ON
+    } else if (temp < 1.0) {
+        digitalWrite(PELTIER_PIN, LOW);  // Turn cooler OFF
+    }
+}
+
+/**
+ * @brief Constructs a JSON payload and publishes it to the MQTT broker.
+ * @param temp The temperature value to publish.
+ * @param hum The humidity value to publish.
+ * @param lat The latitude value to publish.
+ * @param lon The longitude value to publish.
+ */
+void publishData(float temp, float hum, float lat, float lon) {
+    char jsonPayload[200];
+    snprintf(jsonPayload, 200,
+             "{\"box_id\":\"%s\", \"temperature\":%.2f, \"humidity\":%.2f, \"latitude\":%.6f, \"longitude\":%.6f}",
+             BOX_ID, temp, hum, lat, lon);
+
+    if (mqttClient.publish(MQTT_TOPIC, jsonPayload)) {
+        Serial.print("MQTT message published: ");
+        Serial.println(jsonPayload);
+    } else {
+        Serial.println("MQTT message publish failed.");
+    }
+}
