@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useState, useEffect, useRef } from "react";
 import SmartBoxLogo from "./assets/smartboxiotlogo.png";
 import {
@@ -17,14 +16,6 @@ import { useSettings } from "./contexts/SettingsContext";
 import SettingsPanel from "./components/SettingPanel";
 import { useTranslation } from "react-i18next";
 import "./App.css";
-=======
-import { useState, useEffect, useRef } from 'react';
-import SmartBoxLogo from './assets/smartboxiotlogo.png';
-import { Menu, X, Leaf, Heart, Users, Award, Thermometer, Droplets, MapPin, Clock } from 'lucide-react';
-import { useSettings } from './contexts/SettingsContext';
-import SettingsPanel from './components/SettingsPanel';
-import './App.css';
->>>>>>> f2f24cf2331af76a451e3b4a03e0c135c04ae1ac
 
 const SmartBoxDataDisplay = () => {
   const { t } = useTranslation();
@@ -46,17 +37,6 @@ const SmartBoxDataDisplay = () => {
 
   const getTemperatureUnit = () => {
     return temperatureUnit === "fahrenheit" ? "°F" : "°C";
-  };
-
-  const convertTemperature = (celsius) => {
-    if (temperatureUnit === 'fahrenheit') {
-      return (celsius * 9/5) + 32;
-    }
-    return celsius;
-  };
-
-  const getTemperatureUnit = () => {
-    return temperatureUnit === 'fahrenheit' ? '°F' : '°C';
   };
 
   const getLogStatus = (log) => {
@@ -167,15 +147,11 @@ const SmartBoxDataDisplay = () => {
                     </span>
                   </div>
                   <div className="data-item">
-<<<<<<< HEAD
                     <Thermometer size={16} />{" "}
                     <span>
                       {convertTemperature(log.temperature).toFixed(2)}{" "}
                       {getTemperatureUnit()}
                     </span>
-=======
-                    <Thermometer size={16} /> <span>{convertTemperature(log.temperature).toFixed(2)} {getTemperatureUnit()}</span>
->>>>>>> f2f24cf2331af76a451e3b4a03e0c135c04ae1ac
                   </div>
                   <div className="data-item">
                     <Droplets size={16} />{" "}
