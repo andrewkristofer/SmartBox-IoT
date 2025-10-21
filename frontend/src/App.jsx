@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import SmartBoxLogo from './assets/smartboxiotlogo.png'; // Pastikan path-nya benar
+import SmartBoxLogo from './assets/smartboxiotlogo.png';
 import { Menu, X, Leaf, Heart, Users, Award, Thermometer, Droplets, MapPin, Clock } from 'lucide-react';
+import { useSettings } from './contexts/SettingsContext';
+import SettingsPanel from './components/SettingsPanel';
 import './App.css';
 
 const SmartBoxDataDisplay = () => {
@@ -9,14 +11,26 @@ const SmartBoxDataDisplay = () => {
   const [error, setError] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef(null);
+  const { refreshInterval, temperatureUnit } = useSettings();
 
   const boxIdToFetch = 'SMARTBOX-001';
+
+  const convertTemperature = (celsius) => {
+    if (temperatureUnit === 'fahrenheit') {
+      return (celsius * 9/5) + 32;
+    }
+    return celsius;
+  };
+
+  const getTemperatureUnit = () => {
+    return temperatureUnit === 'fahrenheit' ? '°F' : '°C';
+  };
 
   const getLogStatus = (log) => {
     if (!log || typeof log.temperature !== 'number' || typeof log.humidity !== 'number') {
       return { text: 'N/A', className: 'status-unknown' };
     }
-    
+
     const isTempSafe = log.temperature >= 1.0 && log.temperature <= 4.0;
     const isHumidSafe = log.humidity >= 40.0 && log.humidity <= 60.0;
 
@@ -66,10 +80,10 @@ const SmartBoxDataDisplay = () => {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 10000);
+    const interval = setInterval(fetchData, refreshInterval);
 
     return () => clearInterval(interval);
-  }, [boxIdToFetch]);
+  }, [boxIdToFetch, refreshInterval]);
 
   return (
     <div ref={containerRef} className={`live-data-container ${isVisible ? 'visible' : ''}`}>
@@ -100,7 +114,7 @@ const SmartBoxDataDisplay = () => {
                     <Clock size={16} /> <span>{new Date(log.timestamp).toLocaleString('id-ID')}</span>
                   </div>
                   <div className="data-item">
-                    <Thermometer size={16} /> <span>{log.temperature?.toFixed(2)} °C</span>
+                    <Thermometer size={16} /> <span>{convertTemperature(log.temperature).toFixed(2)} {getTemperatureUnit()}</span>
                   </div>
                   <div className="data-item">
                     <Droplets size={16} /> <span>{log.humidity?.toFixed(2)} %</span>
@@ -228,6 +242,9 @@ function App() {
     <div className="app-container">
       {/* Scroll Progress Bar */}
       <div className="scroll-progress-bar" style={{ width: `${scrollProgress}%` }}></div>
+
+      {/* Settings Panel */}
+      <SettingsPanel />
 
       {/* Navigation */}
       <header className={`header ${isHeaderScrolled ? 'scrolled' : ''}`}>
