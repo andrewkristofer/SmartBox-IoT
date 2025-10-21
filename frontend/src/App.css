@@ -1330,3 +1330,71 @@ a:focus-visible {
   background: var(--primary-blue);
   color: white;
 }
+
+/* Dark Mode Styles */
+.dark-mode {
+  --white: #1a1a1a;
+  --text-dark: #e5e5e5;
+  --text-light: #a0a0a0;
+  --bg-light: #2a2a2a;
+  --light-gray: #3a3a3a;
+  --border-light: #4a4a4a;
+}
+
+.dark-mode body {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.dark-mode .hero {
+  background: linear-gradient(0deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.dark-mode .program {
+  background: linear-gradient(0deg, #0f3460 0%, #16213e 50%, #1a1a2e 100%);
+}
+
+.dark-mode .nutrition {
+  background: linear-gradient(0deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.dark-mode .info-card,
+.dark-mode .feature-card {
+  background: #2a2a3a;
+  color: #e5e5e5;
+  border-top-color: var(--primary-blue);
+}
+
+.dark-mode .info-card p,
+.dark-mode .feature-card p {
+  color: #a0a0a0;
+}
+
+.dark-mode .info-card:hover,
+.dark-mode .feature-card:hover {
+  background: #323244;
+}
+
+.dark-mode .hero h1,
+.dark-mode .section-title {
+  color: #e5e5e5;
+}
+
+.dark-mode .tagline {
+  color: var(--primary-blue);
+}
+
+.dark-mode .hero p {
+  color: #a0a0a0;
+}
+
+.dark-mode .live-data-container {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .data-card {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dark-mode .data-card:hover {
+  background: rgba(255, 255, 255, 0.12);
+}

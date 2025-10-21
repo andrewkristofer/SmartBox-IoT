@@ -1,0 +1,57 @@
+{
+  "hero": {
+    "title": "Smart Box IoT",
+    "tagline": "Smart Monitoring for Nutritious Distribution",
+    "description": "Smart Box IoT is an intelligent monitoring system that maintains the temperature, humidity, and location of food supplies. Designed to support the Free Nutritious Meal Program, ensuring food quality during transport."
+  },
+  "program": {
+    "title": "Why Smart Box IoT?",
+    "monitoring": { "title": "Monitoring System", "desc": "Monitors food temperature and humidity in real time to maintain quality during distribution." },
+    "connected": { "title": "Connected and Efficient", "desc": "Integrated with GPS and web dashboard for efficient and secure monitoring." },
+    "responsive": { "title": "Responsive and Secure", "desc": "Sends automatic alerts when temperature or humidity exceed safe thresholds." }
+  },
+  "nutrition": {
+    "title": "How Smart Box IoT Improves Food Distribution and Storage",
+    "quality": { "title": "Maintains Food Quality", "desc": "Ensures food remains fresh and safe during storage and transportation." },
+    "safety": { "title": "Reduces Risk of Damage", "desc": "Provides early warnings for unsafe storage conditions." },
+    "efficiency": { "title": "Enhances Delivery Efficiency", "desc": "Tracks delivery routes in real time for better logistics management." }
+  },
+  "dashboard": {
+    "title": "Contribution Dashboard",
+    "stats": {
+      "meals": "Meals Delivered",
+      "co2": "Kg CO₂ Reduced",
+      "people": "People Helped",
+      "volunteers": "Active Volunteers"
+    }
+  },
+  "footer": {
+    "home": "Home",
+    "program": "Program",
+    "nutrition": "Nutrition",
+    "dashboard": "Dashboard",
+    "copyright": "© 2025 Free Nutritious Meal Program (MBG). Healthy Generation, Green Earth."
+  },
+
+  "errors": {
+  "connectionRefused": "Cannot connect to backend. Please make sure the server is running.",
+  "backendFetch": "Failed to fetch data from backend.",
+  "noData": "No data received yet. Ensure firmware is running and transmitting data."
+},
+
+  "settings": {
+  "title": "Settings",
+  "darkMode": "Dark Mode",
+  "notifications": "Notifications",
+  "displayPrefs": "Display Preferences",
+  "language": "Language",
+  "tempUnit": "Temperature Unit",
+  "celsius": "Celsius (°C)",
+  "fahrenheit": "Fahrenheit (°F)",
+  "dataUpdate": "Data Refresh",
+  "refreshInterval": "Refresh Interval",
+  "reset": "Reset to Default",
+  "confirmReset": "Reset all settings to default?"
+}
+  
+}

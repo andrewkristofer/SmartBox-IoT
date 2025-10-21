@@ -1,0 +1,59 @@
+{
+  "hero": {
+    "title": "Smart Box IoT",
+    "tagline": "Pemantauan Cerdas untuk Distribusi Pangan Bergizi",
+    "description": "Smart Box IoT adalah sistem pemantauan cerdas yang menjaga suhu, kelembapan, dan lokasi bahan pangan. Dirancang untuk mendukung Program Makan Bergizi Gratis agar kualitas pangan tetap terjaga."
+  },
+  "program": {
+    "title": "Mengapa Smart Box IoT?",
+    "monitoring": { "title": "Sistem Monitoring", "desc": "Memantau suhu dan kelembapan bahan pangan secara real-time untuk menjaga kualitas selama distribusi." },
+    "connected": { "title": "Terhubung dan Efisien", "desc": "Terintegrasi dengan GPS dan dashboard web untuk pemantauan yang efisien dan aman." },
+    "responsive": { "title": "Responsif dan Aman", "desc": "Mengirim notifikasi otomatis ketika suhu atau kelembapan di luar batas aman." }
+  },
+  "nutrition": {
+    "title": "Bagaimana Smart Box IoT Meningkatkan Distribusi dan Penyimpanan Pangan",
+    "quality": { "title": "Menjaga Kualitas Pangan", "desc": "Sensor suhu dan kelembapan memastikan bahan makanan tetap segar dan aman." },
+    "safety": { "title": "Mengurangi Risiko Kerusakan", "desc": "Memberikan peringatan dini jika kondisi penyimpanan tidak sesuai." },
+    "efficiency": { "title": "Meningkatkan Efisiensi Pengiriman", "desc": "Pelacakan GPS membantu memantau pengiriman secara langsung." }
+  },
+  "dashboard": {
+    "title": "Dashboard Kontribusi",
+    "stats": {
+      "meals": "Porsi Makanan Disalurkan",
+      "co2": "Kg CO₂ Dikurangi",
+      "people": "Orang Terbantu",
+      "volunteers": "Relawan Aktif"
+    }
+  },
+
+  "errors": {
+  "connectionRefused": "Tidak dapat terhubung ke backend. Pastikan server berjalan.",
+  "backendFetch": "Gagal mengambil data dari backend.",
+  "noData": "Belum ada data yang diterima. Pastikan firmware berjalan dan mengirim data."
+},
+
+  "settings": {
+  "title": "Pengaturan",
+  "openSettings": "Buka Pengaturan",
+  "close": "Tutup Pengaturan",
+  "darkMode": "Mode Gelap",
+  "notifications": "Notifikasi",
+  "displayPrefs": "Preferensi Tampilan",
+  "language": "Bahasa",
+  "tempUnit": "Unit Suhu",
+  "celsius": "Celsius (°C)",
+  "fahrenheit": "Fahrenheit (°F)",
+  "dataUpdate": "Pembaruan Data",
+  "refreshInterval": "Interval Refresh",
+  "reset": "Reset ke Default",
+  "confirmReset": "Reset semua pengaturan ke default?"
+},
+
+  "footer": {
+    "home": "Beranda",
+    "program": "Program",
+    "nutrition": "Nutrisi",
+    "dashboard": "Dashboard",
+    "copyright": "© 2025 Makan Bergizi Gratis (MBG). Generasi Sehat, Bumi Hijau."
+  }
+}
