@@ -23,6 +23,10 @@ from threading import Thread
 import paho.mqtt.client as mqtt
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
+from pymongo.errors import ConnectionFailure, DuplicateKeyError
+from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 import os
 
 # ==============================================================================
@@ -36,9 +40,26 @@ API_PORT = 5000
 script_dir = os.path.dirname(os.path.abspath(__file__))
 DB_FILE = os.path.join(script_dir, "smartbox_data.db")
 
+MONGO_URI = "mongodb+srv://shareefmasyhur_db_user:ZndJ25HwIR3Vz4ZJ@desprocluster.hffwhpv.mongodb.net/?retryWrites=true&w=majority&appName=DesproCluster"
+MONGO_DB_NAME = "smartbox_auth"
+
 # ==============================================================================
 # SECTION 3: DATABASE MANAGEMENT
 # ==============================================================================
+
+try:
+    mongo_client = MongoClient(MONGO_URI)
+    mongo_client.admin.command('ping') # Cek koneksi
+    mongo_db = mongo_client[MONGO_DB_NAME]
+    users_collection = mongo_db["users"]
+    users_collection.create_index("username", unique=True) # Pastikan username unik
+    print("Successfully connected to MongoDB.")
+except ConnectionFailure as e:
+    print(f"Could not connect to MongoDB: {e}")
+    mongo_client = None
+except Exception as e:
+    print(f"An error occurred during MongoDB setup: {e}")
+    mongo_client = None
 
 def initialize_database():
     """
@@ -186,12 +207,94 @@ def get_data_by_box_id(box_id: str):
         if conn:
             conn.close()
 
+@app.route('/api/auth/register', methods=['POST'])
+def register_user():
+    """ Registers a new user using MongoDB. """
+    if not mongo_client: # Periksa koneksi MongoDB
+        return jsonify({"error": "Database connection failed"}), 500
+
+    data = request.get_json()
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({"error": "Missing username or password"}), 400
+
+    username = data['username']
+    password = data['password']
+    email = data.get('email') # Ambil email jika ada, bisa null
+
+    # Hash password sebelum disimpan
+    password_hash = generate_password_hash(password)
+
+    try:
+        # Coba simpan pengguna baru ke MongoDB
+        users_collection.insert_one({
+            "username": username,
+            "password_hash": password_hash,
+            "email": email
+        })
+        print(f"User '{username}' registered successfully in MongoDB.")
+        return jsonify({"message": "User registered successfully"}), 201 # 201 Created
+    except DuplicateKeyError:
+        # Error jika username sudah ada (karena unique index)
+        print(f"Registration failed: Username '{username}' already exists.")
+        return jsonify({"error": "Username already exists"}), 409 # 409 Conflict
+    except Exception as e:
+        print(f"MongoDB error during registration: {e}")
+        return jsonify({"error": f"Database error during registration: {e}"}), 500
+
+@app.route('/api/auth/login', methods=['POST'])
+def login_user():
+    """ Logs in a user using MongoDB. """
+    if not mongo_client: # Periksa koneksi MongoDB
+        return jsonify({"error": "Database connection failed"}), 500
+
+    data = request.get_json()
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({"error": "Missing username or password"}), 400
+
+    username = data['username']
+    password = data['password']
+
+    try:
+        # Cari pengguna berdasarkan username di MongoDB
+        user_data = users_collection.find_one({"username": username})
+
+        # Periksa apakah pengguna ditemukan DAN hash password cocok
+        if user_data and check_password_hash(user_data['password_hash'], password):
+            # Password cocok
+            print(f"User '{username}' logged in successfully via MongoDB.")
+            # Siapkan data user (tanpa hash password!) untuk dikirim ke frontend
+            user_info = {
+                "id": str(user_data['_id']), # Ubah ObjectId ke string
+                "username": user_data['username'],
+                "email": user_data.get('email') # Kirim email jika ada
+            }
+            # Di aplikasi nyata, Anda akan membuat dan mengirim token JWT di sini
+            # Untuk sekarang, kita kirim token dummy
+            dummy_token = f"dummy-jwt-token-for-{username}"
+            return jsonify({
+                "message": "Login successful",
+                "token": dummy_token, # Kirim token ke frontend
+                "user": user_info
+                }), 200 # 200 OK
+        else:
+            # Pengguna tidak ditemukan atau password salah
+            print(f"Failed MongoDB login attempt for username: '{username}'")
+            return jsonify({"error": "Invalid username or password"}), 401 # 401 Unauthorized
+    except Exception as e:
+        print(f"MongoDB error during login: {e}")
+        return jsonify({"error": f"Database error during login: {e}"}), 500
+
 # ==============================================================================
 # SECTION 6: MAIN EXECUTION
 # ==============================================================================
 if __name__ == '__main__':
     # 1. Ensure the database is ready for use.
     initialize_database()
+
+    # 👇 Pastikan MongoDB terhubung
+    if not mongo_client:
+        print("Exiting due to MongoDB connection failure.")
+        exit(1)
     
     # 2. Start the MQTT listener in a background thread.
     print("Starting MQTT listener thread...")

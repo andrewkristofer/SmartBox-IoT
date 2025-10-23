@@ -1,3 +1,5 @@
 flask
 paho-mqtt
 flask-cors
+Werkzeug
+pymongo

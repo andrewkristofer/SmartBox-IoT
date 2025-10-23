@@ -54,6 +54,17 @@
   "confirmReset": "Reset all settings to default?"
 },
 
+"dashboard": {
+    "title": "Contribution Dashboard",
+    "liveFeedTitle": "Live Data Feed (ID: {{boxId}})",
+    "stats": {
+      "meals": "Meals Delivered",
+      "co2": "Kg CO₂ Reduced",
+      "people": "People Helped",
+      "volunteers": "Active Volunteers"
+    }
+  },
+
 "login": {
     "title": "Admin Login",
     "usernameLabel": "Username",

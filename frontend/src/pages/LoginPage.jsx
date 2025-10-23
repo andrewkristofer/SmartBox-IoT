@@ -1,7 +1,5 @@
 // src/pages/LoginPage.jsx
-
 import React, { useState } from 'react';
-// 👇 Impor Link dari react-router-dom
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -23,14 +21,24 @@ const LoginPage = () => {
     setError('');
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulasi delay
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-      if (username === 'admin' && password === 'password') {
-        login();
-        navigate('/dashboard');
-      } else {
-        throw new Error(t('login.invalidCredentials', 'Invalid username or password'));
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || t('login.genericError', 'Invalid credentials'));
       }
+
+      // Login berhasil
+      login(data.token, data.user);
+      navigate('/dashboard');
+
     } catch (err) {
       setError(err.message || t('login.genericError', 'An error occurred during login.'));
       console.error("Login error:", err);
@@ -56,6 +64,7 @@ const LoginPage = () => {
               placeholder={t('login.usernamePlaceholder', 'Enter username')}
             />
           </div>
+
           <div className="form-group">
             <label htmlFor="password">{t('login.passwordLabel', 'Password')}</label>
             <input
@@ -81,16 +90,12 @@ const LoginPage = () => {
           </button>
         </form>
 
-        {/* 👇 TAMBAHKAN LINK SIGNUP DI SINI 👇 */}
         <p className="signup-link-text">
-          {t('login.noAccount', 'Belum punya akun?')} {/* Tambahkan key ini ke file json */}
-          {' '} {/* Spasi */}
+          {t('login.noAccount', 'Belum punya akun?')}{' '}
           <Link to="/signup" className="signup-link">
-             {t('login.signUpHere', 'Daftar di sini')} {/* Tambahkan key ini ke file json */}
+            {t('login.signUpHere', 'Daftar di sini')}
           </Link>
         </p>
-        {/* 👆 BATAS LINK SIGNUP 👆 */}
-
       </div>
     </div>
   );

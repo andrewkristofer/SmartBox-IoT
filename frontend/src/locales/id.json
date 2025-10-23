@@ -57,6 +57,17 @@
     "copyright": "© 2025 Makan Bergizi Gratis (MBG). Generasi Sehat, Bumi Hijau."
   },
 
+  "dashboard": {
+    "title": "Dashboard Kontribusi",
+    "liveFeedTitle": "Data Langsung (ID: {{boxId}})", 
+    "stats": {
+      "meals": "Porsi Makanan Disalurkan",
+      "co2": "Kg CO₂ Dikurangi",
+      "people": "Orang Terbantu",
+      "volunteers": "Relawan Aktif"
+    }
+  },
+
   "login": {
     "title": "Login Admin",
     "usernameLabel": "Nama Pengguna",
@@ -66,6 +77,8 @@
     "loginButton": "Masuk",
     "loggingIn": "Masuk...",
     "invalidCredentials": "Nama pengguna atau kata sandi salah.",
+    "noAccount": "Belum punya akun?",
+    "signUpHere": "Daftar di sini",
     "genericError": "Terjadi kesalahan saat login."
   }
 

@@ -1,31 +1,58 @@
 // src/contexts/AuthContext.jsx
 
-import React, { createContext, useState, useContext } from 'react'; // Hapus useEffect jika tidak dipakai
+import React, { createContext, useState, useContext } from 'react';
 
-// 1. Buat Context dan ekspor DENGAN NAMA (named export)
-export const AuthContext = createContext(null); // Tambahkan 'export'
+export const AuthContext = createContext(null);
 
-// 2. Buat Provider Component dan ekspor DENGAN NAMA
 export const AuthProvider = ({ children }) => {
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem('authToken'));
+  const [currentUser, setCurrentUser] = useState(() => {
+      try {
+          // Pastikan item ada sebelum parsing
+          const storedUser = localStorage.getItem('currentUser');
+          return storedUser ? JSON.parse(storedUser) : null;
+      } catch {
+          return null;
+      }
+  });
+
+  // 👇 HAPUS DEKLARASI STATE isAuthenticated INI
+  /*
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('isLoggedIn') === 'true';
   });
+  */
 
-  const login = () => {
-    localStorage.setItem('isLoggedIn', 'true');
-    setIsAuthenticated(true);
-    console.log("User logged in");
+  // 👇 GUNAKAN DERIVED STATE INI SAJA
+  const isAuthenticated = !!authToken; // true jika authToken ada
+
+  const login = (token, user) => {
+    // Validasi sederhana (jangan simpan jika token/user null/undefined)
+    if (token && user) {
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        setAuthToken(token);
+        setCurrentUser(user);
+        console.log("User logged in with token:", token);
+    } else {
+        console.error("Login function called without valid token or user data.");
+        // Mungkin logout untuk membersihkan state jika data tidak valid
+        logout();
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem('isLoggedIn');
-    setIsAuthenticated(false);
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+    setAuthToken(null);
+    setCurrentUser(null);
     console.log("User logged out");
   };
 
-  // Nilai context tidak perlu diubah
   const value = {
     isAuthenticated,
+    authToken,
+    currentUser,
     login,
     logout,
   };
@@ -33,15 +60,10 @@ export const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// 3. Buat custom hook dan ekspor DENGAN NAMA
 export const useAuth = () => {
-  const context = useContext(AuthContext); // useContext sekarang merujuk ke AuthContext yang di-ekspor
+  const context = useContext(AuthContext);
   if (!context) {
-    // Pesan error lebih jelas
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
-
-// 4. Hapus export default jika ada
-// export default AuthContext; // <-- Hapus baris ini
