@@ -55,5 +55,18 @@
     "nutrition": "Nutrisi",
     "dashboard": "Dashboard",
     "copyright": "© 2025 Makan Bergizi Gratis (MBG). Generasi Sehat, Bumi Hijau."
+  },
+
+  "login": {
+    "title": "Login Admin",
+    "usernameLabel": "Nama Pengguna",
+    "passwordLabel": "Kata Sandi",
+    "usernamePlaceholder": "Masukkan nama pengguna",
+    "passwordPlaceholder": "Masukkan kata sandi",
+    "loginButton": "Masuk",
+    "loggingIn": "Masuk...",
+    "invalidCredentials": "Nama pengguna atau kata sandi salah.",
+    "genericError": "Terjadi kesalahan saat login."
   }
+
 }
