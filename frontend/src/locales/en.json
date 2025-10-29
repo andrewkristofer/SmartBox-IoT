@@ -16,15 +16,47 @@
     "safety": { "title": "Reduces Risk of Damage", "desc": "Provides early warnings for unsafe storage conditions." },
     "efficiency": { "title": "Enhances Delivery Efficiency", "desc": "Tracks delivery routes in real time for better logistics management." }
   },
+
+  "header": {
+    "nav": {
+      "what": "What",
+      "why": "Why",
+      "how": "How",
+      "dashboard": "Dashboard",
+      "home": "Home",
+      "login": "Login",
+      "logout": "Logout"
+    }
+  },
+  
   "dashboard": {
     "title": "Contribution Dashboard",
+    "operationalTitle": "Operational Dashboard",
+    "fleetTableTitle": "Live Fleet Status",
+    "liveFeedTitle": "Live Data Feed (ID: {{boxId}})",
     "stats": {
       "meals": "Meals Delivered",
       "co2": "Kg CO₂ Reduced",
       "people": "People Helped",
       "volunteers": "Active Volunteers"
+    },
+    "table": {
+      "boxId": "Box ID",
+      "status": "Status",
+      "temp": "Temp.",
+      "humidity": "Humidity",
+      "location": "Location",
+      "lastSeen": "Last Seen"
     }
   },
+
+  "status": {
+    "safe": "Safe",
+    "danger": "Danger",
+    "offline": "Offline",
+    "noData": "No Data Yet"
+  },
+
   "footer": {
     "home": "Home",
     "program": "Program",
@@ -77,6 +109,25 @@
     "genericError": "An error occurred during login.",
     "noAccount": "Don't have an account?",
     "signUpHere": "Sign up here"
+  },
+
+  "signup": { 
+    "title": "Register Admin Account",
+    "usernameLabel": "Username",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "usernamePlaceholder": "Choose a username",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Create a password (min. 6 chars)",
+    "confirmPasswordPlaceholder": "Re-enter your password",
+    "signupButton": "Sign Up",
+    "registering": "Registering...",
+    "passwordMismatch": "Passwords do not match!",
+    "genericError": "An error occurred during registration.",
+    "success": "Registration successful! Redirecting to login...",
+    "alreadyAccount": "Already have an account?",
+    "loginHere": "Login here"
   }
   
 }

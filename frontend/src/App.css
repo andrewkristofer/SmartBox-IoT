@@ -111,6 +111,7 @@ body {
   display: flex;
   list-style: none;
   gap: 2rem;
+  align-items: center; /* Pastikan ini ada */
 }
 
 .nav-links button {
@@ -126,6 +127,16 @@ body {
   border: 1px solid transparent;
   position: relative;
   overflow: hidden;
+  
+  display: inline-flex; /* <- Harus ada di sini */
+  align-items: center; /* <- Harus ada di sini */
+}
+
+/* === RULE PENTING 2 === */
+/* Pastikan rule ini HANYA berisi 'gap' */
+.auth-button {
+  gap: 0.5rem; /* <- HANYA INI */
+  /* JANGAN ADA 'display' atau 'align-items' di sini */
 }
 
 .nav-links button::before {
@@ -1399,30 +1410,6 @@ a:focus-visible {
   background: rgba(255, 255, 255, 0.12);
 }
 
-.login-page-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: calc(100vh - 80px); /* Sesuaikan 80px dengan tinggi header Anda */
-  padding: 2rem;
-  padding-top: 100px; /* Beri jarak dari header */
-}
-
-.login-form-card {
-  background: var(--white);
-  padding: 2.5rem 2rem;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-}
-
-.login-form-card h2 {
-  margin-bottom: 1.5rem;
-  color: var(--dark-blue);
-}
-
 .form-group {
   margin-bottom: 1rem;
   text-align: left;
@@ -1443,98 +1430,237 @@ a:focus-visible {
   font-size: 1rem;
 }
 
-.login-error-message {
-  color: #ef4444; /* Merah */
-  background-color: rgba(239, 68, 68, 0.1);
-  padding: 0.8rem;
-  border-radius: 5px;
-  margin-bottom: 1rem;
+.fleet-table-container {
+  margin-top: 3rem;
+  background: rgba(0,0,0,0.2);
+  padding: 2rem;
+  border-radius: 15px;
+  border-top: 2px solid var(--primary-blue);
+  width: 100%;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideUpFade 0.8s ease-out 0.2s forwards;
+}
+
+.fleet-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.fleet-table-header h3 {
+  font-size: 1.8rem;
+  color: white;
+}
+
+.refresh-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--primary-blue);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.refresh-button:hover {
+  background: var(--primary-blue);
+}
+
+.refresh-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.refresh-button svg.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.fleet-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: white;
+}
+
+.fleet-table th,
+.fleet-table td {
+  padding: 1rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.fleet-table th {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.fleet-table td {
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
+.fleet-table tr:last-child td {
+  border-bottom: none;
+}
+
+.fleet-table tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 600;
   font-size: 0.9rem;
 }
 
+.status-badge.status-safe {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.status-badge.status-danger {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.status-badge.status-offline {
+  background: rgba(107, 114, 128, 0.2);
+  color: #a0a0a0;
+}
+
+.status-badge.status-unknown {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.location-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--primary-blue);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.location-link:hover {
+  color: #90CAF9;
+  text-decoration: underline;
+}
+
+.location-link.disabled {
+  color: #a0a0a0;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.loading-text {
+  text-align: center;
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.nav-button-style {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none; /* Hapus underline dari Link */
+  display: inline-flex; /* Agar ikon dan teks sejajar */
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Samakan font */
+}
+
+.nav-button-style::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(79, 195, 247, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s ease, height 0.5s ease;
+}
+
+.nav-button-style:hover::before {
+  width: 150%;
+  height: 300%;
+}
+
+.nav-button-style:hover {
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+  border-color: var(--primary-blue);
+}
+
+/* GANTI SEMUA ATURAN .login-button DENGAN INI */
+
 .login-button {
-  /* Styling mirip tombol di header atau buat baru */
   background: linear-gradient(135deg, var(--dark-blue), #0D47A1);
   color: white;
-  padding: 0.8rem 1.5rem;
+  padding: 0.9rem 1.5rem; /* Sedikit lebih tinggi */
   border: none;
-  border-radius: 25px;
+  border-radius: 12px; /* Lebih kotak, tapi tetap rounded */
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Transisi lebih cepat */
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 1.5rem; /* Jarak lebih besar dari input */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  box-shadow: 0 4px 10px rgba(21, 101, 192, 0.2); /* Shadow awal lebih soft */
+  text-transform: uppercase; /* Agar lebih tegas */
+  letter-spacing: 0.5px; /* Jarak antar huruf */
 }
 
 .login-button:hover {
-  opacity: 0.9;
-  box-shadow: 0 4px 15px rgba(21, 101, 192, 0.4);
+  /* Ganti opacity dengan brightness dan shadow lebih kuat */
+  filter: brightness(1.1); 
+  box-shadow: 0 6px 20px rgba(21, 101, 192, 0.4);
+  transform: translateY(-2px); /* Efek sedikit terangkat */
 }
 
- .login-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
- }
-
- /* Styling untuk dark mode jika ada */
- .dark-mode .login-form-card {
-    background: #2a2a3a;
- }
- .dark-mode .login-form-card h2 {
-    color: #e5e5e5;
- }
-
- /* Tambahkan di App.css */
-.signup-link-text {
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: var(--text-light);
+.login-button:active {
+  /* Efek saat tombol ditekan */
+  transform: translateY(0px);
+  filter: brightness(0.95);
+  box-shadow: 0 2px 8px rgba(21, 101, 192, 0.3);
 }
 
-.signup-link {
-  color: var(--primary-blue); /* Atau var(--dark-blue) */
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.3s ease;
+.login-button:disabled {
+   opacity: 0.5; /* Opacity lebih rendah untuk disabled */
+   cursor: not-allowed;
+   box-shadow: none; /* Hilangkan shadow saat disabled */
+   transform: translateY(0px); /* Pastikan tidak terangkat saat disabled */
 }
 
-.signup-link:hover {
-  color: var(--dark-blue); /* Atau var(--primary-blue) */
-  text-decoration: underline;
-}
-
-/* Styling Dark Mode jika ada */
-.dark-mode .signup-link-text {
-   color: #a0a0a0;
-}
-.dark-mode .signup-link {
-   color: var(--primary-blue);
-}
- .dark-mode .signup-link:hover {
-   color: #90CAF9; /* Warna biru lebih terang */
-}
-
-/* Tambahkan di App.css, misalnya setelah styling .login-error-message */
-
-.signup-success-message {
-  color: #155724; /* Warna teks hijau tua */
-  background-color: #d4edda; /* Warna latar hijau muda */
-  border: 1px solid #c3e6cb; /* Warna border hijau lebih muda */
-  padding: 0.8rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-/* Opsional: Styling Dark Mode untuk pesan sukses */
-.dark-mode .signup-success-message {
-  color: #a3e635; /* Warna teks hijau terang */
-  background-color: rgba(163, 230, 53, 0.15); /* Warna latar hijau transparan */
-  border: 1px solid rgba(163, 230, 53, 0.3); /* Warna border hijau transparan */
+/* Jaga konsistensi jarak ikon */
+.login-button svg {
+  margin-right: 4px; /* Sedikit geser ke kiri */
 }

@@ -1,25 +1,24 @@
-// src/components/SmartBoxDataDisplay.jsx (Jika Anda buat file terpisah)
-// ATAU letakkan definisi ini di dalam src/pages/DashboardPage.jsx sebelum 'export default'
-
-import React, { useState, useEffect, useRef } from 'react';
+// src/components/SmartBoxDataDisplay.jsx
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSettings } from '../contexts/SettingsContext'; // Pastikan path ini benar
-import { Thermometer, Droplets, MapPin, Clock } from 'lucide-react';
-import '../App.css'; // Atau CSS spesifik jika ada
+import { useSettings } from '../contexts/SettingsContext';
+import { Thermometer, Droplets, MapPin, Clock, AlertTriangle, CheckCircle, WifiOff, RefreshCw } from 'lucide-react';
+import { getSmartBoxData } from '../services/api'; // Layanan API kita yang sudah ada
+import '../App.css'; 
 
-const SmartBoxDataDisplay = () => {
+// Terima prop 'boxIds' dari DashboardPage
+const SmartBoxDataDisplay = ({ boxIds }) => {
   const { t } = useTranslation();
-  const [smartBoxData, setSmartBoxData] = useState([]);
+  // 'fleetStatus' akan menyimpan data terbaru dari SEMUA box, 
+  // diindeks berdasarkan boxId
+  const [fleetStatus, setFleetStatus] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isVisible, setIsVisible] = useState(false); // Untuk animasi container
   const containerRef = useRef(null);
-  // Ambil pengaturan dari context
-  const { refreshInterval, temperatureUnit } = useSettings();
+  const { temperatureUnit } = useSettings();
 
-  const boxIdToFetch = "SMARTBOX-001";
+  // --- Fungsi Helper (Bisa dipindahkan ke file util terpisah) ---
 
-  // Fungsi konversi suhu
   const convertTemperature = (celsius) => {
     if (temperatureUnit === "fahrenheit") {
       return (celsius * 9) / 5 + 32;
@@ -27,192 +26,180 @@ const SmartBoxDataDisplay = () => {
     return celsius;
   };
 
-  // Fungsi mendapatkan unit suhu
-  const getTemperatureUnit = () => {
-    return temperatureUnit === "fahrenheit" ? "°F" : "°C";
-  };
+  const getTemperatureUnit = () => (temperatureUnit === "fahrenheit" ? "°F" : "°C");
 
-  // Fungsi menentukan status log
+  // Perbarui fungsi getLogStatus untuk menangani status "Offline"
   const getLogStatus = (log) => {
-    if (
-      !log ||
-      typeof log.temperature !== "number" ||
-      typeof log.humidity !== "number"
-    ) {
-      return { text: "N/A", className: "status-unknown" };
+    if (!log) {
+      return { text: t('status.offline'), className: "status-offline", icon: <WifiOff size={16} /> };
     }
+    if (!log.timestamp) {
+      return { text: t('status.noData'), className: "status-unknown", icon: <AlertTriangle size={16} /> };
+    }
+
     const isTempSafe = log.temperature >= 1.0 && log.temperature <= 4.0;
     const isHumidSafe = log.humidity >= 40.0 && log.humidity <= 60.0;
 
     if (isTempSafe && isHumidSafe) {
-      // Gunakan t() untuk teks status jika Anda ingin menerjemahkannya
-      return { text: t('status.safe', 'Aman'), className: "status-safe" };
+      return { text: t('status.safe'), className: "status-safe", icon: <CheckCircle size={16} /> };
     } else {
-      return { text: t('status.danger', 'Bahaya'), className: "status-danger" };
+      return { text: t('status.danger'), className: "status-danger", icon: <AlertTriangle size={16} /> };
     }
   };
 
-  // Effect untuk Intersection Observer (animasi container)
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.2 } // Muncul saat 20% terlihat
+  // --- Logika Pengambilan Data ---
+
+  // Gunakan useCallback agar fungsi ini stabil
+  const fetchFleetData = useCallback(async () => {
+    console.log("Fetching fleet data...");
+    setIsLoading(true);
+    setError(null);
+
+    // 1. Buat array 'promises' untuk setiap panggilan API
+    // Kita panggil getSmartBoxData dengan limit=1 untuk mendapatkan data *terbaru*
+    const promises = boxIds.map(id => 
+      getSmartBoxData(id, 1)
+        .then(data => ({ id, status: 'fulfilled', data: data[0] })) // data[0] karena API mengembalikan array
+        .catch(error => ({ id, status: 'rejected', error }))
     );
 
-    const currentRef = containerRef.current; // Salin ref ke variabel
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
+    // 2. Jalankan semua promise secara paralel
+    const results = await Promise.allSettled(promises);
 
-    // Cleanup observer
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
+    // 3. Proses hasilnya menjadi satu state object
+    const newFleetStatus = {};
+    results.forEach(result => {
+      if (result.status === 'fulfilled') {
+        const { id, data } = result.value;
+        // Jika data[0] ada, simpan. Jika tidak (box belum pernah kirim data),
+        // simpan 'null' agar bisa ditandai 'Belum Ada Data'
+        newFleetStatus[id] = data || { id, timestamp: null }; 
+      } else {
+        // Jika promise gagal (misalnya error jaringan), tandai sebagai 'offline'
+        const { id } = result.reason; // Asumsi error object memiliki ID, mari kita perbaiki
+        // Jika getSmartBoxData di-reject, kita tidak tahu ID-nya. 
+        // Kita harus memproses 'promises' yang asli, bukan 'results'
       }
-       observer.disconnect();
-    };
-  }, []); // Hanya dijalankan saat mount
+    });
+    
+    // Mari kita gunakan cara yang lebih sederhana dengan 'promises'
+    const settledPromises = await Promise.all(promises);
+    const finalStatus = {};
+    settledPromises.forEach(res => {
+        finalStatus[res.id] = res.data; // res.data bisa undefined jika API gagal/box 404
+    });
 
-  // Effect untuk mengambil data dari backend
+    setFleetStatus(finalStatus);
+    setIsLoading(false);
+
+  }, [boxIds, t]); // Hapus 't' jika getLogStatus dipindah
+
+  // Ambil data saat komponen dimuat
   useEffect(() => {
-    const fetchData = async () => {
-      // Jangan set isLoading true jika hanya refresh
-      // setIsLoading(true); // Mungkin bisa dihapus jika tidak ingin loading indicator setiap refresh
-      setError(null);
-      try {
-        const response = await fetch(
-          // Sesuaikan URL jika endpoint backend berubah
-          `http://localhost:5000/api/data/${boxIdToFetch}?limit=6`
-        );
-        if (!response.ok) {
-          // Coba parse error dari backend jika ada
-          let errorMsg = `HTTP error! status: ${response.status}`;
-          try {
-            const errorData = await response.json();
-            errorMsg = errorData.error || errorMsg;
-          } catch (parseError) {
-             // Biarkan errorMsg default jika response bukan JSON
-          }
-          throw new Error(errorMsg);
-        }
-        const data = await response.json();
-        setSmartBoxData(data);
-      } catch (e) {
-        console.error("Fetch error:", e);
-        // Pesan error lebih deskriptif
-        const message = e.message.includes("Failed to fetch") || e.message.includes("NetworkError")
-          ? t("errors.connectionRefused") // Pesan jika server tidak bisa dijangkau
-          : t("errors.backendFetch", { details: e.message }); // Pesan jika error lain dari backend
-        setError(message);
-      } finally {
-         // Set isLoading false hanya saat pengambilan data pertama kali selesai
-         if (isLoading) setIsLoading(false);
-      }
-    };
+    fetchFleetData();
+    // Kita hapus interval refresh otomatis agar tidak membanjiri API
+    // Kita akan tambahkan tombol refresh manual
+  }, [fetchFleetData]);
 
-    fetchData(); // Ambil data saat komponen mount
-    const interval = setInterval(fetchData, refreshInterval); // Atur interval refresh
-
-    // Cleanup interval saat komponen unmount
-    return () => clearInterval(interval);
-     // Tambahkan isLoading ke dependency array agar fetchData dipanggil ulang saat isLoading berubah (jika diperlukan)
-     // Hapus isLoading jika tidak ingin fetchData terpanggil ulang saat isLoading berubah
-  }, [boxIdToFetch, refreshInterval, t, isLoading]); // Tambahkan t ke dependencies jika digunakan di pesan error
+  // --- Render (JSX) ---
 
   return (
-    <div
-      ref={containerRef}
-      // Terapkan class 'visible' berdasarkan state isVisible
-      className={`live-data-container ${isVisible ? "visible" : ""}`}
-    >
-      <h3 className="live-data-title">
-        {t('dashboard.liveFeedTitle', { boxId: boxIdToFetch })} {/* Gunakan t() */}
-        <div className="live-indicator"></div>
-      </h3>
+    <div ref={containerRef} className="fleet-table-container">
+      <div className="fleet-table-header">
+        <h3>{t('dashboard.fleetTableTitle')}</h3>
+        <button 
+          onClick={fetchFleetData} 
+          disabled={isLoading} 
+          className="refresh-button"
+        >
+          <RefreshCw size={16} className={isLoading ? 'spinning' : ''} />
+          {isLoading ? t('loading', 'Memuat...') : t('refresh', 'Refresh')}
+        </button>
+      </div>
 
-      {/* Tampilkan loading hanya saat pertama kali load */}
-      {isLoading && <p>{t('loading', 'Loading data...')}</p>}
-
-      {/* Tampilkan pesan error jika ada */}
       {error && (
         <div className="error-message">
           <span>⚠️ {error}</span>
         </div>
       )}
 
-      {/* Tampilkan data jika tidak loading, tidak error, dan ada data */}
-      {!isLoading && !error && smartBoxData.length > 0 && (
-        <div className="data-cards-grid">
-          {smartBoxData.map((log, index) => {
+      <table className="fleet-table">
+        <thead>
+          <tr>
+            <th>{t('dashboard.table.boxId')}</th>
+            <th>{t('dashboard.table.status')}</th>
+            <th>{t('dashboard.table.temp')}</th>
+            <th>{t('dashboard.table.humidity')}</th>
+            <th>{t('dashboard.table.location')}</th>
+            <th>{t('dashboard.table.lastSeen')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {/* Ubah 'boxIds.map' menjadi mapping dari state 'fleetStatus' */}
+          {boxIds.map(id => {
+            const log = fleetStatus[id]; // Dapatkan data terbaru untuk ID ini dari state
             const status = getLogStatus(log);
-            // URL Google Maps (pastikan format latitude/longitude benar)
-            const gmapsUrl = (log.latitude && log.longitude)
+            const gmapsUrl = (log?.latitude && log?.longitude)
               ? `https://www.google.com/maps?q=${log.latitude},${log.longitude}`
-              : "#"; // Link non-aktif jika lat/lon tidak valid
+              : "#";
 
             return (
-              <div
-                key={log.id || `log-${index}`} // Gunakan index sebagai fallback key
-                className={`data-card ${isVisible ? "visible" : ""}`} // Animasi card
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className={`status-indicator ${status.className}`}>
-                  {status.text}
-                </div>
-
-                <div className="data-item">
-                  <Clock size={16} />
-                  <span>
-                    {log.timestamp ? new Date(log.timestamp).toLocaleString("id-ID") : t('na', 'N/A')}
+              <tr key={id}>
+                {/* ID Box */}
+                <td><strong>{id}</strong></td>
+                
+                {/* Status */}
+                <td>
+                  <span className={`status-badge ${status.className}`}>
+                    {status.icon}
+                    {status.text}
                   </span>
-                </div>
-                <div className="data-item">
-                  <Thermometer size={16} />
-                  <span>
-                    {typeof log.temperature === 'number'
-                      ? `${convertTemperature(log.temperature).toFixed(2)} ${getTemperatureUnit()}`
-                      : t('na', 'N/A')}
-                  </span>
-                </div>
-                <div className="data-item">
-                  <Droplets size={16} />
-                  <span>
-                    {typeof log.humidity === 'number'
-                      ? `${log.humidity.toFixed(2)} %`
-                      : t('na', 'N/A')}
-                  </span>
-                </div>
-
-                <a
-                  href={gmapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`data-item-link ${!(log.latitude && log.longitude) ? 'disabled-link' : ''}`} // Tambah class jika link non-aktif
-                >
-                  <div className="data-item">
+                </td>
+                
+                {/* Suhu */}
+                <td>
+                  {typeof log?.temperature === 'number'
+                    ? `${convertTemperature(log.temperature).toFixed(2)} ${getTemperatureUnit()}`
+                    : '—'}
+                </td>
+                
+                {/* Kelembapan */}
+                <td>
+                  {typeof log?.humidity === 'number'
+                    ? `${log.humidity.toFixed(2)} %`
+                    : '—'}
+                </td>
+                
+                {/* Lokasi */}
+                <td>
+                  <a
+                    href={gmapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`location-link ${gmapsUrl === '#' ? 'disabled' : ''}`}
+                  _>
                     <MapPin size={16} />
-                    <span>
-                      {log.latitude && log.longitude
-                        ? `${log.latitude.toFixed(4)}, ${log.longitude.toFixed(4)}`
-                        : t('location.unavailable', 'Lokasi tidak tersedia')}
-                    </span>
-                  </div>
-                </a>
-              </div>
+                    {gmapsUrl !== '#' ? t('viewMap', 'Lihat Peta') : t('na', 'N/A')}
+                  </a>
+                </td>
+                
+                {/* Terakhir Dilihat */}
+                <td>
+                  {log?.timestamp 
+                    ? new Date(log.timestamp).toLocaleString("id-ID") 
+                    : '—'}
+                </td>
+              </tr>
             );
           })}
-        </div>
-      )}
+        </tbody>
+      </table>
+      
+      {/* Tampilkan pesan loading di bawah tabel */}
+      {isLoading && <p className="loading-text">{t('loading', 'Mengambil data armada...')}</p>}
 
-      {/* Tampilkan pesan jika tidak loading, tidak error, tapi tidak ada data */}
-      {!isLoading && !error && smartBoxData.length === 0 && (
-        <p>{t("errors.noData")}</p>
-      )}
     </div>
   );
 };
 
-// Jika Anda membuat file terpisah, tambahkan baris ini:
 export default SmartBoxDataDisplay;

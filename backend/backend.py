@@ -2,8 +2,8 @@
 Backend server for the Smart Box IoT project.
 
 Author: Kelompok 11 - Universitas Indonesia
-Version: 1.1 (Portable DB Path)
-Date: 2025-10
+Version: 1.2 (Implement .env and JWT)
+Date: 2025-10-28
 
 This script performs two main functions:
 1.  Listens for incoming data from Smart Box devices via an MQTT broker
@@ -19,7 +19,11 @@ The MQTT listener and the Flask server run concurrently in separate threads.
 import sqlite3
 import json
 import time
+import os
+import jwt 
+import datetime 
 from threading import Thread
+from dotenv import load_dotenv 
 import paho.mqtt.client as mqtt
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -27,21 +31,39 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo.errors import ConnectionFailure, DuplicateKeyError
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
-import os
 
+# =Otomatis
+# SECTION 2: KONFIGURASI
 # ==============================================================================
-# SECTION 2: CONFIGURATION
-# ==============================================================================
-MQTT_BROKER = "broker.hivemq.com"
-MQTT_PORT = 1883
-MQTT_TOPIC = "smartbox/kelompok11/data"  # Must match the firmware topic
-API_PORT = 5000
 
+# Tentukan path ke direktori script dan file .env
+# Ini mengasumsikan file .env Anda berada SATU LEVEL DI ATAS folder backend
 script_dir = os.path.dirname(os.path.abspath(__file__))
-DB_FILE = os.path.join(script_dir, "smartbox_data.db")
+dotenv_path = os.path.join(script_dir, '..', '.env') # <-- BARU
 
-MONGO_URI = "mongodb+srv://shareefmasyhur_db_user:ZndJ25HwIR3Vz4ZJ@desprocluster.hffwhpv.mongodb.net/?retryWrites=true&w=majority&appName=DesproCluster"
-MONGO_DB_NAME = "smartbox_auth"
+# Muat environment variables dari file .env
+load_dotenv(dotenv_path=dotenv_path) # <-- BARU
+
+# --- Ambil Konfigurasi dari Environment Variables ---
+MQTT_BROKER = os.getenv("MQTT_BROKER") # <-- DIUBAH
+MQTT_PORT = int(os.getenv("MQTT_PORT", 1883)) # <-- DIUBAH (dengan default)
+MQTT_TOPIC = os.getenv("MQTT_TOPIC") # <-- DIUBAH
+API_PORT = int(os.getenv("API_PORT", 5000)) # <-- DIUBAH (dengan default)
+
+# Path ke DB SQLite (relatif terhadap script backend.py)
+DB_FILE_NAME = os.getenv("DB_FILE", "smartbox_data.db") # <-- DIUBAH
+DB_FILE = os.path.join(script_dir, DB_FILE_NAME) # <-- DIUBAH
+
+# Konfigurasi MongoDB dan JWT
+MONGO_URI = os.getenv("MONGO_URI") # <-- DIUBAH
+MONGO_DB_NAME = "smartbox_auth" # (Bisa juga dimasukkan ke .env jika mau)
+JWT_SECRET = os.getenv("JWT_SECRET") # <-- BARU (Kunci rahasia untuk token)
+
+# Periksa apakah variabel penting sudah dimuat
+if not all([MONGO_URI, JWT_SECRET, MQTT_BROKER, MQTT_TOPIC]): # <-- BARU
+    print("FATAL ERROR: Variabel .env (MONGO_URI, JWT_SECRET, MQTT_BROKER, MQTT_TOPIC) tidak ditemukan.")
+    print(f"Mencoba memuat dari: {dotenv_path}")
+    # exit(1) # Hentikan eksekusi jika variabel penting tidak ada
 
 # ==============================================================================
 # SECTION 3: DATABASE MANAGEMENT
@@ -70,7 +92,7 @@ def initialize_database():
     the application starts accepting data.
     """
     try:
-        conn = sqlite3.connect(DB_FILE)
+        conn = sqlite3.connect(DB_FILE) # <-- DIUBAH (menggunakan var DB_FILE)
         cursor = conn.cursor()
         create_table_query = """
         CREATE TABLE IF NOT EXISTS smartbox_data (
@@ -85,7 +107,7 @@ def initialize_database():
         """
         cursor.execute(create_table_query)
         conn.commit()
-        print(f"Database '{DB_FILE}' is initialized and ready.")
+        print(f"Database '{DB_FILE}' is initialized and ready.") # <-- DIUBAH
     except sqlite3.Error as e:
         print(f"Database initialization error: {e}")
     finally:
@@ -101,7 +123,7 @@ def store_sensor_data(payload: dict):
                         parsed from the MQTT message JSON.
     """
     try:
-        conn = sqlite3.connect(DB_FILE)
+        conn = sqlite3.connect(DB_FILE) # <-- DIUBAH (menggunakan var DB_FILE)
         cursor = conn.cursor()
         insert_query = """
         INSERT INTO smartbox_data (box_id, temperature, humidity, latitude, longitude)
@@ -131,8 +153,8 @@ def on_connect(client, userdata, flags, rc):
     """Callback function for when the client connects to the MQTT broker."""
     if rc == 0:
         print("Successfully connected to MQTT Broker!")
-        client.subscribe(MQTT_TOPIC)
-        print(f"Subscribed to topic: {MQTT_TOPIC}")
+        client.subscribe(MQTT_TOPIC) # <-- DIUBAH (menggunakan var)
+        print(f"Subscribed to topic: {MQTT_TOPIC}") # <-- DIUBAH (menggunakan var)
     else:
         print(f"Failed to connect to MQTT Broker, return code {rc}")
 
@@ -160,7 +182,7 @@ def start_mqtt_listener():
     client.on_message = on_message
     
     try:
-        client.connect(MQTT_BROKER, MQTT_PORT, 60)
+        client.connect(MQTT_BROKER, MQTT_PORT, 60) # <-- DIUBAH (menggunakan var)
         client.loop_forever()
     except Exception as e:
         print(f"Could not start MQTT listener: {e}")
@@ -175,20 +197,11 @@ CORS(app)
 def get_data_by_box_id(box_id: str):
     """
     API endpoint to retrieve sensor data for a specific Smart Box.
-    
-    It accepts a `limit` query parameter to control the number of records
-    returned. Defaults to 100 if not specified.
-
-    Args:
-        box_id (str): The unique identifier of the Smart Box.
-
-    Returns:
-        flask.Response: A JSON response containing a list of data records
-                        or an error message.
+    ...
     """
     limit = request.args.get('limit', 100, type=int)
     try:
-        conn = sqlite3.connect(DB_FILE)
+        conn = sqlite3.connect(DB_FILE) # <-- DIUBAH (menggunakan var DB_FILE)
         conn.row_factory = sqlite3.Row  # Return rows as dict-like objects
         cursor = conn.cursor()
         
@@ -219,24 +232,27 @@ def register_user():
 
     username = data['username']
     password = data['password']
-    email = data.get('email') # Ambil email jika ada, bisa null
+    email = data.get('email') 
 
-    # Hash password sebelum disimpan
+    # --- Validasi Sederhana (Bisa Ditambahkan) ---
+    if len(password) < 6: # <-- BARU (Contoh validasi)
+         return jsonify({"error": "Password must be at least 6 characters long"}), 400
+    if not email: # <-- BARU (Contoh validasi)
+         return jsonify({"error": "Email is required"}), 400
+
     password_hash = generate_password_hash(password)
 
     try:
-        # Coba simpan pengguna baru ke MongoDB
         users_collection.insert_one({
             "username": username,
             "password_hash": password_hash,
             "email": email
         })
         print(f"User '{username}' registered successfully in MongoDB.")
-        return jsonify({"message": "User registered successfully"}), 201 # 201 Created
+        return jsonify({"message": "User registered successfully"}), 201
     except DuplicateKeyError:
-        # Error jika username sudah ada (karena unique index)
         print(f"Registration failed: Username '{username}' already exists.")
-        return jsonify({"error": "Username already exists"}), 409 # 409 Conflict
+        return jsonify({"error": "Username already exists"}), 409 
     except Exception as e:
         print(f"MongoDB error during registration: {e}")
         return jsonify({"error": f"Database error during registration: {e}"}), 500
@@ -244,8 +260,12 @@ def register_user():
 @app.route('/api/auth/login', methods=['POST'])
 def login_user():
     """ Logs in a user using MongoDB. """
-    if not mongo_client: # Periksa koneksi MongoDB
+    if not mongo_client: 
         return jsonify({"error": "Database connection failed"}), 500
+        
+    if not JWT_SECRET: # <-- BARU (Pastikan JWT_SECRET ada)
+        print("FATAL: JWT_SECRET is not set in .env file.")
+        return jsonify({"error": "Server configuration error"}), 500
 
     data = request.get_json()
     if not data or not data.get('username') or not data.get('password'):
@@ -255,31 +275,36 @@ def login_user():
     password = data['password']
 
     try:
-        # Cari pengguna berdasarkan username di MongoDB
         user_data = users_collection.find_one({"username": username})
 
-        # Periksa apakah pengguna ditemukan DAN hash password cocok
         if user_data and check_password_hash(user_data['password_hash'], password):
             # Password cocok
             print(f"User '{username}' logged in successfully via MongoDB.")
-            # Siapkan data user (tanpa hash password!) untuk dikirim ke frontend
-            user_info = {
-                "id": str(user_data['_id']), # Ubah ObjectId ke string
-                "username": user_data['username'],
-                "email": user_data.get('email') # Kirim email jika ada
+            
+            # --- BUAT TOKEN JWT (MENGGANTIKAN DUMMY_TOKEN) --- # <-- BARU
+            token_payload = {
+                'user_id': str(user_data['_id']), # ID pengguna
+                'username': user_data['username'],
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24) # Masa berlaku: 24 jam
             }
-            # Di aplikasi nyata, Anda akan membuat dan mengirim token JWT di sini
-            # Untuk sekarang, kita kirim token dummy
-            dummy_token = f"dummy-jwt-token-for-{username}"
+            # 'HS256' adalah algoritma signing
+            token = jwt.encode(token_payload, JWT_SECRET, algorithm="HS256")
+            # --- SELESAI MEMBUAT TOKEN ---
+            
+            user_info = {
+                "id": str(user_data['_id']), 
+                "username": user_data['username'],
+                "email": user_data.get('email') 
+            }
+            
             return jsonify({
                 "message": "Login successful",
-                "token": dummy_token, # Kirim token ke frontend
+                "token": token, # <-- DIUBAH (Kirim token asli)
                 "user": user_info
-                }), 200 # 200 OK
+                }), 200 
         else:
-            # Pengguna tidak ditemukan atau password salah
             print(f"Failed MongoDB login attempt for username: '{username}'")
-            return jsonify({"error": "Invalid username or password"}), 401 # 401 Unauthorized
+            return jsonify({"error": "Invalid username or password"}), 401 
     except Exception as e:
         print(f"MongoDB error during login: {e}")
         return jsonify({"error": f"Database error during login: {e}"}), 500
@@ -291,17 +316,17 @@ if __name__ == '__main__':
     # 1. Ensure the database is ready for use.
     initialize_database()
 
-    # 👇 Pastikan MongoDB terhubung
+    # 2. Pastikan MongoDB terhubung
     if not mongo_client:
         print("Exiting due to MongoDB connection failure.")
         exit(1)
     
-    # 2. Start the MQTT listener in a background thread.
+    # 3. Start the MQTT listener in a background thread.
     print("Starting MQTT listener thread...")
     mqtt_thread = Thread(target=start_mqtt_listener)
     mqtt_thread.daemon = True
     mqtt_thread.start()
     
-    # 3. Start the Flask web server in the main thread.
+    # 4. Start the Flask web server in the main thread.
     print(f"Starting Flask API server on port {API_PORT}...")
     app.run(host='0.0.0.0', port=API_PORT)

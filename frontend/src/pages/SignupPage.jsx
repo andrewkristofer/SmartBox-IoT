@@ -4,10 +4,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { UserPlus } from 'lucide-react';
 import '../App.css';
+import styles from './AuthPage.module.css';
+import { registerUser } from '../services/api';
 
 const SignupPage = () => {
   const { t } = useTranslation();
-  const [username, setUsername] = useState('');
+  // PASTIKAN SEMUA STATE INI ADA DAN TIDAK DIKOMENTARI
+  const [username, setUsername] = useState(''); // <-- PASTIKAN INI ADA
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -16,6 +19,7 @@ const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  // ... (fungsi handleSignup Anda) ...
   const handleSignup = async (event) => {
     event.preventDefault();
     setIsLoading(true);
@@ -23,41 +27,32 @@ const SignupPage = () => {
     setSuccess('');
 
     if (password !== confirmPassword) {
-      setError(t('signup.passwordMismatch', 'Passwords do not match!'));
+      setError(t('signup.passwordMismatch')); // Menggunakan key dari JSON
       setIsLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || t('signup.genericError', 'Registration failed.'));
-      }
-
-      setSuccess(t('signup.success', 'Registration successful! Redirecting to login...'));
+      const data = await registerUser({ username, email, password });
+      setSuccess(t('signup.success')); // Menggunakan key dari JSON
       setTimeout(() => navigate('/login'), 2000);
 
     } catch (err) {
-      setError(err.message || t('signup.genericError', 'An error occurred during registration.'));
+      setError(err.message || t('signup.genericError')); // Menggunakan key dari JSON
       console.error("Signup error:", err);
       setIsLoading(false);
     }
   };
 
+
   return (
-    <div className="signup-page-container login-page-container">
-      <div className="signup-form-card login-form-card">
-        <h2>{t('signup.title', 'Register Admin Account')}</h2>
+    <div className={`${styles.loginPageContainer} ${styles.signupPageContainer}`}>
+      <div className={`${styles.loginFormCard} ${styles.signupFormCard}`}>
+        <h2>{t('signup.title')}</h2> {/* Menggunakan key dari JSON */}
         <form onSubmit={handleSignup}>
+          
           <div className="form-group">
-            <label htmlFor="username">{t('signup.usernameLabel', 'Username')}</label>
+            <label htmlFor="username">{t('signup.usernameLabel')}</label> {/* Menggunakan key dari JSON */}
             <input
               type="text"
               id="username"
@@ -65,24 +60,26 @@ const SignupPage = () => {
               onChange={(e) => setUsername(e.target.value)}
               required
               disabled={isLoading}
-              placeholder={t('signup.usernamePlaceholder', 'Choose a username')}
+              // TAMBAHKAN PLACEHOLDER
+              placeholder={t('signup.usernamePlaceholder')} 
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">{t('signup.emailLabel', 'Email')}</label>
+            <label htmlFor="email">{t('signup.emailLabel')}</label> {/* Menggunakan key dari JSON */}
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
-              placeholder={t('signup.emailPlaceholder', 'Enter your email')}
+              // TAMBAHKAN PLACEHOLDER
+              placeholder={t('signup.emailPlaceholder')} 
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">{t('signup.passwordLabel', 'Password')}</label>
+            <label htmlFor="password">{t('signup.passwordLabel')}</label> {/* Menggunakan key dari JSON */}
             <input
               type="password"
               id="password"
@@ -91,12 +88,13 @@ const SignupPage = () => {
               required
               minLength="6"
               disabled={isLoading}
-              placeholder={t('signup.passwordPlaceholder', 'Create a password (min. 6 chars)')}
+              // TAMBAHKAN PLACEHOLDER
+              placeholder={t('signup.passwordPlaceholder')} 
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="confirmPassword">{t('signup.confirmPasswordLabel', 'Confirm Password')}</label>
+            <label htmlFor="confirmPassword">{t('signup.confirmPasswordLabel')}</label> {/* Menggunakan key dari JSON */}
             <input
               type="password"
               id="confirmPassword"
@@ -105,27 +103,29 @@ const SignupPage = () => {
               required
               minLength="6"
               disabled={isLoading}
-              placeholder={t('signup.confirmPasswordPlaceholder', 'Re-enter your password')}
+              // TAMBAHKAN PLACEHOLDER
+              placeholder={t('signup.confirmPasswordPlaceholder')} 
             />
           </div>
+          
+          {error && <p className={styles.loginErrorMessage}>{error}</p>}
+          {success && <p className={styles.signupSuccessMessage}>{success}</p>}
 
-          {error && <p className="login-error-message">{error}</p>}
-          {success && <p className="signup-success-message">{success}</p>}
-
-          <button type="submit" className="signup-button login-button" disabled={isLoading}>
-            {isLoading ? t('signup.registering', 'Registering...') : (
+          <button type="submit" className="login-button" disabled={isLoading}>
+            {isLoading ? t('signup.registering') : ( /* Menggunakan key dari JSON */
               <>
                 <UserPlus size={16} style={{ marginRight: '8px' }} />
-                {t('signup.signupButton', 'Sign Up')}
+                {/* PASTIKAN INI MENGGUNAKAN KEY DARI JSON */}
+                {t('signup.signupButton')} 
               </>
             )}
           </button>
         </form>
 
-        <p className="login-link-text signup-link-text">
-          {t('signup.alreadyAccount', 'Already have an account?')}{' '}
-          <Link to="/login" className="login-link signup-link">
-            {t('signup.loginHere', 'Login here')}
+        <p className={styles.signupLinkText}>
+          {t('signup.alreadyAccount')}{' '} {/* Menggunakan key dari JSON */}
+          <Link to="/login" className={styles.signupLink}>
+            {t('signup.loginHere')} {/* Menggunakan key dari JSON */}
           </Link>
         </p>
       </div>

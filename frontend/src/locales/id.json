@@ -18,12 +18,29 @@
   },
   "dashboard": {
     "title": "Dashboard Kontribusi",
+    "operationalTitle": "Dashboard Operasional", 
+    "fleetTableTitle": "Status Armada Langsung",
+    "liveFeedTitle": "Data Langsung (ID: {{boxId}})", 
     "stats": {
       "meals": "Porsi Makanan Disalurkan",
       "co2": "Kg CO₂ Dikurangi",
       "people": "Orang Terbantu",
       "volunteers": "Relawan Aktif"
+    },
+    "table": {
+      "boxId": "ID Box",
+      "status": "Status",
+      "temp": "Suhu",
+      "humidity": "Kelembapan",
+      "location": "Lokasi",
+      "lastSeen": "Terakhir Dilihat"
     }
+  },
+  "status": {
+    "safe": "Aman",
+    "danger": "Bahaya",
+    "offline": "Offline",
+    "noData": "Belum Ada Data"
   },
 
   "errors": {
@@ -57,15 +74,43 @@
     "copyright": "© 2025 Makan Bergizi Gratis (MBG). Generasi Sehat, Bumi Hijau."
   },
 
+  "header": {
+    "nav": {
+      "what": "Tentang",
+      "why": "Mengapa",
+      "how": "Bagaimana",
+      "dashboard": "Dashboard",
+      "home": "Home",
+      "login": "Login",
+      "logout": "Logout"
+    }
+  },
+
   "dashboard": {
     "title": "Dashboard Kontribusi",
+    "operationalTitle": "Dashboard Operasional", 
+    "fleetTableTitle": "Status Armada Langsung",
     "liveFeedTitle": "Data Langsung (ID: {{boxId}})", 
     "stats": {
       "meals": "Porsi Makanan Disalurkan",
       "co2": "Kg CO₂ Dikurangi",
       "people": "Orang Terbantu",
       "volunteers": "Relawan Aktif"
+    },
+    "table": {
+      "boxId": "ID Box",
+      "status": "Status",
+      "temp": "Suhu",
+      "humidity": "Kelembapan",
+      "location": "Lokasi",
+      "lastSeen": "Terakhir Dilihat"
     }
+  },
+  "status": {
+    "safe": "Aman",
+    "danger": "Bahaya",
+    "offline": "Offline",
+    "noData": "Belum Ada Data"
   },
 
   "login": {
@@ -80,6 +125,25 @@
     "noAccount": "Belum punya akun?",
     "signUpHere": "Daftar di sini",
     "genericError": "Terjadi kesalahan saat login."
+  },
+
+  "signup": { 
+    "title": "Registrasi Akun Admin",
+    "usernameLabel": "Nama Pengguna",
+    "emailLabel": "Email",
+    "passwordLabel": "Kata Sandi",
+    "confirmPasswordLabel": "Konfirmasi Kata Sandi",
+    "usernamePlaceholder": "Pilih nama pengguna",
+    "emailPlaceholder": "Masukkan email Anda",
+    "passwordPlaceholder": "Buat kata sandi (min. 6 karakter)",
+    "confirmPasswordPlaceholder": "Masukkan ulang kata sandi Anda",
+    "signupButton": "Daftar",
+    "registering": "Mendaftar...",
+    "passwordMismatch": "Kata sandi tidak cocok!",
+    "genericError": "Terjadi kesalahan saat registrasi.",
+    "success": "Registrasi berhasil! Mengarahkan ke login...",
+    "alreadyAccount": "Sudah punya akun?",
+    "loginHere": "Masuk di sini"
   }
 
 }

@@ -4,7 +4,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { LogIn } from 'lucide-react';
-import '../App.css';
+import '../App.css'; 
+// Pastikan nama file ini benar (AuthPage.module.css atau LoginPage.module.css)
+import styles from './AuthPage.module.css'; 
+import { loginUser } from '../services/api';
 
 const LoginPage = () => {
   const { t } = useTranslation();
@@ -15,30 +18,16 @@ const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // ... (fungsi handleLogin Anda sudah benar) ...
   const handleLogin = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || t('login.genericError', 'Invalid credentials'));
-      }
-
-      // Login berhasil
+      const data = await loginUser(username, password);
       login(data.token, data.user);
       navigate('/dashboard');
-
     } catch (err) {
       setError(err.message || t('login.genericError', 'An error occurred during login.'));
       console.error("Login error:", err);
@@ -47,11 +36,15 @@ const LoginPage = () => {
     }
   };
 
+
   return (
-    <div className="login-page-container">
-      <div className="login-form-card">
+    // UBAH SEMUA 'className' STRING MENJADI OBJEK 'styles'
+    <div className={styles.loginPageContainer}>
+      <div className={styles.loginFormCard}>
         <h2>{t('login.title', 'Admin Login')}</h2>
         <form onSubmit={handleLogin}>
+          
+          {/* .form-group masih global di App.css, jadi INI BIARKAN */}
           <div className="form-group">
             <label htmlFor="username">{t('login.usernameLabel', 'Username')}</label>
             <input
@@ -78,8 +71,10 @@ const LoginPage = () => {
             />
           </div>
 
-          {error && <p className="login-error-message">{error}</p>}
+          {/* UBAH INI */}
+          {error && <p className={styles.loginErrorMessage}>{error}</p>}
 
+          {/* .login-button masih global di App.css, jadi INI BIARKAN */}
           <button type="submit" className="login-button" disabled={isLoading}>
             {isLoading ? t('login.loggingIn', 'Logging in...') : (
               <>
@@ -90,9 +85,10 @@ const LoginPage = () => {
           </button>
         </form>
 
-        <p className="signup-link-text">
+        {/* UBAH INI */}
+        <p className={styles.signupLinkText}>
           {t('login.noAccount', 'Belum punya akun?')}{' '}
-          <Link to="/signup" className="signup-link">
+          <Link to="/signup" className={styles.signupLink}>
             {t('login.signUpHere', 'Daftar di sini')}
           </Link>
         </p>

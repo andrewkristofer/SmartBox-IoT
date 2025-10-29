@@ -1,0 +1,90 @@
+/* src/pages/AuthPage.module.css */
+/* Style ini sekarang digunakan oleh LoginPage.jsx dan SignupPage.jsx */
+
+/* --- Style Dasar (Dipakai Login & Signup) --- */
+.loginPageContainer { /* Kita tetap pakai nama ini untuk konsistensi */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px); 
+  padding: 2rem;
+  padding-top: 100px;
+}
+
+.loginFormCard { /* Kita tetap pakai nama ini untuk konsistensi */
+  background: var(--white);
+  padding: 2.5rem 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.loginFormCard h2 {
+  margin-bottom: 1.5rem;
+  color: var(--dark-blue);
+  /* font-size: 1.8rem; */
+}
+
+.loginErrorMessage { /* Dipakai Login & Signup untuk error */
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+  padding: 0.8rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.signupLinkText { /* Dipakai Login & Signup untuk link bawah */
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.signupLink { /* Dipakai Login & Signup untuk link bawah */
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.signupLink:hover {
+  color: var(--dark-blue);
+  text-decoration: underline;
+}
+
+/* --- Style Spesifik Signup --- */
+.signupSuccessMessage {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+
+/* --- Dark Mode --- */
+:global(.dark-mode) .loginFormCard { /* Berlaku untuk Login & Signup */
+  background: #2a2a3a;
+}
+:global(.dark-mode) .loginFormCard h2 { /* Berlaku untuk Login & Signup */
+  color: #e5e5e5;
+}
+:global(.dark-mode) .signupLinkText { /* Berlaku untuk Login & Signup */
+   color: #a0a0a0;
+}
+:global(.dark-mode) .signupLink { /* Berlaku untuk Login & Signup */
+   color: var(--primary-blue);
+}
+:global(.dark-mode) .signupLink:hover { /* Berlaku untuk Login & Signup */
+   color: #90CAF9;
+}
+:global(.dark-mode) .signupSuccessMessage { /* Hanya Signup */
+  color: #a3e635;
+  background-color: rgba(163, 230, 53, 0.15);
+  border: 1px solid rgba(163, 230, 53, 0.3);
+}
