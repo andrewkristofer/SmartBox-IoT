@@ -132,11 +132,42 @@ body {
   align-items: center; /* <- Harus ada di sini */
 }
 
-/* === RULE PENTING 2 === */
-/* Pastikan rule ini HANYA berisi 'gap' */
 .auth-button {
-  gap: 0.5rem; /* <- HANYA INI */
-  /* JANGAN ADA 'display' atau 'align-items' di sini */
+  /* Reset style bawaan button */
+  background: rgba(255, 255, 255, 0.15); /* Latar transparan elegan */
+  border: 1px solid rgba(255, 255, 255, 0.4); /* Border tipis */
+  color: white;
+  
+  /* Ukuran & Layout */
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px; /* Pill shape */
+  font-size: 0.9rem;
+  font-weight: 600;
+  
+  /* Flexbox untuk sejajarkan Ikon & Teks */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  
+  /* Reset Margin & Text Case (Ini perbaikan utamanya) */
+  margin-top: 0 !important; /* Hapus margin atas biar sejajar */
+  text-transform: capitalize; /* Biar tidak CAPS LOCK semua */
+  
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.auth-button:hover {
+  background: white;
+  color: var(--dark-blue); /* Warna teks berubah jadi biru saat hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Penyesuaian ikon di dalam tombol */
+.auth-button svg {
+  stroke-width: 2.5px; /* Ikon sedikit lebih tebal */
 }
 
 .nav-links button::before {

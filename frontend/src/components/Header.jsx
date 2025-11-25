@@ -118,7 +118,7 @@ const Header = () => {
             ) : (
               // Sembunyikan tombol login jika kita sudah di halaman login/signup
               !['/login', '/signup'].includes(location.pathname) && (
-                <button onClick={handleLogin} className="auth-button login-button">
+                <button onClick={handleLogin} className="auth-button">
                    <LogIn size={16} /> {t("header.nav.login", "Login")}
                 </button>
               )
