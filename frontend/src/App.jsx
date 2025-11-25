@@ -7,11 +7,12 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
-import ProtectedRoute from "./components/ProtectedRoute"; 
+import ProtectedRoute from "./components/ProtectedRoute";
 import SettingsPanel from "./components/SettingPanel";
 import SignupPage from "./pages/SignupPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import BoxDetailPage from "./pages/BoxDetailPage";
 
 import { AuthProvider } from "./contexts/AuthContext";
 // 👇 Hapus impor SettingsProvider jika sudah di main.jsx
@@ -45,6 +46,14 @@ function App() {
             }
           />
           {/* <Route path="*" element={<div>404 Not Found</div>} /> */}
+          <Route
+            path="/dashboard/:boxId"
+            element={
+              <ProtectedRoute>
+                <BoxDetailPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
         {showFooter && <Footer />}
       </div>

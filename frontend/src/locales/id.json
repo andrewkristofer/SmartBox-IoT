@@ -144,6 +144,17 @@
     "success": "Registrasi berhasil! Mengarahkan ke login...",
     "alreadyAccount": "Sudah punya akun?",
     "loginHere": "Masuk di sini"
+  },
+  "detail": {
+    "back": "Kembali ke Dashboard",
+    "title": "Detail Armada",
+    "currentTemp": "Suhu Terkini",
+    "currentHum": "Kelembapan Terkini",
+    "lastUpdate": "Pembaruan Terakhir",
+    "chartTitle": "Grafik Riwayat Suhu & Kelembapan",
+    "chartTemp": "Suhu (°C)",
+    "chartHum": "Kelembapan (%)",
+    "safeMax": "Maks Aman",
+    "safeMin": "Min Aman"
   }
-
 }

@@ -6,17 +6,34 @@
   },
   "program": {
     "title": "Why Smart Box IoT?",
-    "monitoring": { "title": "Monitoring System", "desc": "Monitors food temperature and humidity in real time to maintain quality during distribution." },
-    "connected": { "title": "Connected and Efficient", "desc": "Integrated with GPS and web dashboard for efficient and secure monitoring." },
-    "responsive": { "title": "Responsive and Secure", "desc": "Sends automatic alerts when temperature or humidity exceed safe thresholds." }
+    "monitoring": {
+      "title": "Monitoring System",
+      "desc": "Monitors food temperature and humidity in real time to maintain quality during distribution."
+    },
+    "connected": {
+      "title": "Connected and Efficient",
+      "desc": "Integrated with GPS and web dashboard for efficient and secure monitoring."
+    },
+    "responsive": {
+      "title": "Responsive and Secure",
+      "desc": "Sends automatic alerts when temperature or humidity exceed safe thresholds."
+    }
   },
   "nutrition": {
     "title": "How Smart Box IoT Improves Food Distribution and Storage",
-    "quality": { "title": "Maintains Food Quality", "desc": "Ensures food remains fresh and safe during storage and transportation." },
-    "safety": { "title": "Reduces Risk of Damage", "desc": "Provides early warnings for unsafe storage conditions." },
-    "efficiency": { "title": "Enhances Delivery Efficiency", "desc": "Tracks delivery routes in real time for better logistics management." }
+    "quality": {
+      "title": "Maintains Food Quality",
+      "desc": "Ensures food remains fresh and safe during storage and transportation."
+    },
+    "safety": {
+      "title": "Reduces Risk of Damage",
+      "desc": "Provides early warnings for unsafe storage conditions."
+    },
+    "efficiency": {
+      "title": "Enhances Delivery Efficiency",
+      "desc": "Tracks delivery routes in real time for better logistics management."
+    }
   },
-
   "header": {
     "nav": {
       "what": "What",
@@ -28,7 +45,6 @@
       "logout": "Logout"
     }
   },
-  
   "dashboard": {
     "title": "Contribution Dashboard",
     "operationalTitle": "Operational Dashboard",
@@ -49,14 +65,12 @@
       "lastSeen": "Last Seen"
     }
   },
-
   "status": {
     "safe": "Safe",
     "danger": "Danger",
     "offline": "Offline",
     "noData": "No Data Yet"
   },
-
   "footer": {
     "home": "Home",
     "program": "Program",
@@ -64,40 +78,26 @@
     "dashboard": "Dashboard",
     "copyright": "© 2025 Free Nutritious Meal Program (MBG). Healthy Generation, Green Earth."
   },
-
   "errors": {
-  "connectionRefused": "Cannot connect to backend. Please make sure the server is running.",
-  "backendFetch": "Failed to fetch data from backend.",
-  "noData": "No data received yet. Ensure firmware is running and transmitting data."
-},
-
-  "settings": {
-  "title": "Settings",
-  "darkMode": "Dark Mode",
-  "notifications": "Notifications",
-  "displayPrefs": "Display Preferences",
-  "language": "Language",
-  "tempUnit": "Temperature Unit",
-  "celsius": "Celsius (°C)",
-  "fahrenheit": "Fahrenheit (°F)",
-  "dataUpdate": "Data Refresh",
-  "refreshInterval": "Refresh Interval",
-  "reset": "Reset to Default",
-  "confirmReset": "Reset all settings to default?"
-},
-
-"dashboard": {
-    "title": "Contribution Dashboard",
-    "liveFeedTitle": "Live Data Feed (ID: {{boxId}})",
-    "stats": {
-      "meals": "Meals Delivered",
-      "co2": "Kg CO₂ Reduced",
-      "people": "People Helped",
-      "volunteers": "Active Volunteers"
-    }
+    "connectionRefused": "Cannot connect to backend. Please make sure the server is running.",
+    "backendFetch": "Failed to fetch data from backend.",
+    "noData": "No data received yet. Ensure firmware is running and transmitting data."
   },
-
-"login": {
+  "settings": {
+    "title": "Settings",
+    "darkMode": "Dark Mode",
+    "notifications": "Notifications",
+    "displayPrefs": "Display Preferences",
+    "language": "Language",
+    "tempUnit": "Temperature Unit",
+    "celsius": "Celsius (°C)",
+    "fahrenheit": "Fahrenheit (°F)",
+    "dataUpdate": "Data Refresh",
+    "refreshInterval": "Refresh Interval",
+    "reset": "Reset to Default",
+    "confirmReset": "Reset all settings to default?"
+  },
+  "login": {
     "title": "Admin Login",
     "usernameLabel": "Username",
     "passwordLabel": "Password",
@@ -110,8 +110,7 @@
     "noAccount": "Don't have an account?",
     "signUpHere": "Sign up here"
   },
-
-  "signup": { 
+  "signup": {
     "title": "Register Admin Account",
     "usernameLabel": "Username",
     "emailLabel": "Email",
@@ -128,6 +127,17 @@
     "success": "Registration successful! Redirecting to login...",
     "alreadyAccount": "Already have an account?",
     "loginHere": "Login here"
+  },
+  "detail": {
+    "back": "Back to Dashboard",
+    "title": "Fleet Detail",
+    "currentTemp": "Current Temp",
+    "currentHum": "Current Humidity",
+    "lastUpdate": "Last Updated",
+    "chartTitle": "Temperature & Humidity History",
+    "chartTemp": "Temp (°C)",
+    "chartHum": "Humidity (%)",
+    "safeMax": "Max Safe",
+    "safeMin": "Min Safe"
   }
-  
 }

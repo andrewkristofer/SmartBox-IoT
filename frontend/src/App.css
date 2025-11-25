@@ -1664,3 +1664,162 @@ a:focus-visible {
 .login-button svg {
   margin-right: 4px; /* Sedikit geser ke kiri */
 }
+
+/* Leaflet Map Customization */
+.leaflet-container {
+    background: #aad3df !important; /* Warna laut default yg lebih soft */
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 10px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+}
+
+.leaflet-popup-content strong {
+    color: var(--dark-blue);
+    font-size: 1.1rem;
+}
+
+/* --- POLISHING DASHBOARD & DETAIL PAGE --- */
+
+/* 1. Latar Belakang Kartu dibuat Putih Solid & Tegas */
+.stat-card {
+  background: #ffffff; /* Putih bersih */
+  border-radius: 16px; /* Sudut membulat modern */
+  padding: 2rem;
+  text-align: center;
+  
+  /* Shadow yang lembut tapi memberi efek "melayang" (Elevation) */
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+    0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  
+  /* Border tipis agar batasnya jelas di background biru muda */
+  border: 1px solid rgba(255, 255, 255, 0.5); 
+  
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px); /* Efek naik saat di-hover */
+  box-shadow: 
+    0 10px 20px -5px rgba(21, 101, 192, 0.15), 
+    0 8px 8px -6px rgba(21, 101, 192, 0.1);
+  border-color: var(--primary-blue); /* Border jadi biru saat hover */
+}
+
+/* 2. Ikon: Beri lingkaran background biar ikonnya menonjol */
+.stat-icon {
+  width: 3rem; 
+  height: 3rem;
+  margin: 0 auto 1rem;
+  padding: 0.6rem;
+  
+  /* Background lingkaran biru muda transparan */
+  background-color: rgba(79, 195, 247, 0.15); 
+  color: var(--dark-blue); /* Warna ikonnya biru tua */
+  border-radius: 50%; /* Membuat jadi bulat */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 3. Angka Utama (Value): Dibuat Gelap & Besar */
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800; /* Lebih tebal */
+  color: #1e293b; /* Slate-900 (Hampir hitam, bukan biru muda) */
+  margin-bottom: 0.5rem;
+  letter-spacing: -1px;
+}
+
+/* 4. Label (Judul Bawah): Dibuat Abu-abu Jelas */
+.stat-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b; /* Slate-500 (Abu-abu medium, mudah dibaca) */
+  text-transform: uppercase; /* Huruf kapital semua biar rapi */
+  letter-spacing: 0.05em; /* Jarak antar huruf sedikit renggang */
+}
+
+/* 5. Grafik Container: Agar senada dengan kartu */
+.chart-container {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+    0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  margin-top: 2rem;
+}
+
+/* Judul Grafik */
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.chart-title::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 24px;
+  background: var(--primary-blue);
+  border-radius: 2px;
+}
+
+.dark-mode .stat-card,
+.dark-mode .chart-container {
+  background: #1e293b; /* Warna Slate Gelap */
+  border-color: #334155; /* Border abu-abu tua */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); /* Shadow lebih pekat */
+}
+
+/* 2. Teks Angka & Judul jadi Terang */
+.dark-mode .stat-number,
+.dark-mode .chart-title {
+  color: #f1f5f9; /* Putih tulang */
+}
+
+/* 3. Label Kecil jadi Abu-abu Terang */
+.dark-mode .stat-label {
+  color: #94a3b8;
+}
+
+/* 4. Background Ikon jadi lebih transparan */
+.dark-mode .stat-icon {
+  background-color: rgba(79, 195, 247, 0.1); 
+  color: #4FC3F7; /* Biru muda neon biar pop-up di gelap */
+}
+
+/* 5. Tombol Kembali (Back Button) */
+.back-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex; 
+  align-items: center; 
+  gap: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  color: #1565C0; /* Default (Light Mode) */
+  transition: color 0.3s ease;
+}
+
+.dark-mode .back-btn {
+  color: #60A5FA; /* Biru muda saat dark mode */
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}

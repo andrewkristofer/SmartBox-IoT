@@ -2,22 +2,21 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSettings } from '../contexts/SettingsContext';
-import { Thermometer, Droplets, MapPin, Clock, AlertTriangle, CheckCircle, WifiOff, RefreshCw } from 'lucide-react';
-import { getSmartBoxData } from '../services/api'; // Layanan API kita yang sudah ada
-import '../App.css'; 
+import { Thermometer, Droplets, MapPin, AlertTriangle, CheckCircle, WifiOff, RefreshCw } from 'lucide-react';
+import { getSmartBoxData } from '../services/api';
+import FleetMap from './FleetMap'; // Pastikan file ini sudah dibuat
+import { Link } from 'react-router-dom';
+import '../App.css';
 
-// Terima prop 'boxIds' dari DashboardPage
 const SmartBoxDataDisplay = ({ boxIds }) => {
   const { t } = useTranslation();
-  // 'fleetStatus' akan menyimpan data terbaru dari SEMUA box, 
-  // diindeks berdasarkan boxId
   const [fleetStatus, setFleetStatus] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const containerRef = useRef(null);
-  const { temperatureUnit } = useSettings();
 
-  // --- Fungsi Helper (Bisa dipindahkan ke file util terpisah) ---
+  const { temperatureUnit, refreshInterval } = useSettings();
 
   const convertTemperature = (celsius) => {
     if (temperatureUnit === "fahrenheit") {
@@ -28,7 +27,6 @@ const SmartBoxDataDisplay = ({ boxIds }) => {
 
   const getTemperatureUnit = () => (temperatureUnit === "fahrenheit" ? "°F" : "°C");
 
-  // Perbarui fungsi getLogStatus untuk menangani status "Offline"
   const getLogStatus = (log) => {
     if (!log) {
       return { text: t('status.offline'), className: "status-offline", icon: <WifiOff size={16} /> };
@@ -47,73 +45,60 @@ const SmartBoxDataDisplay = ({ boxIds }) => {
     }
   };
 
-  // --- Logika Pengambilan Data ---
+  const fetchFleetData = useCallback(async (isBackground = false) => {
+    if (!isBackground) setIsLoading(true);
+    else setIsRefreshing(true);
 
-  // Gunakan useCallback agar fungsi ini stabil
-  const fetchFleetData = useCallback(async () => {
-    console.log("Fetching fleet data...");
-    setIsLoading(true);
     setError(null);
 
-    // 1. Buat array 'promises' untuk setiap panggilan API
-    // Kita panggil getSmartBoxData dengan limit=1 untuk mendapatkan data *terbaru*
-    const promises = boxIds.map(id => 
+    const promises = boxIds.map(id =>
       getSmartBoxData(id, 1)
-        .then(data => ({ id, status: 'fulfilled', data: data[0] })) // data[0] karena API mengembalikan array
+        .then(data => ({ id, status: 'fulfilled', data: data[0] }))
         .catch(error => ({ id, status: 'rejected', error }))
     );
 
-    // 2. Jalankan semua promise secara paralel
     const results = await Promise.allSettled(promises);
 
-    // 3. Proses hasilnya menjadi satu state object
     const newFleetStatus = {};
     results.forEach(result => {
       if (result.status === 'fulfilled') {
         const { id, data } = result.value;
-        // Jika data[0] ada, simpan. Jika tidak (box belum pernah kirim data),
-        // simpan 'null' agar bisa ditandai 'Belum Ada Data'
-        newFleetStatus[id] = data || { id, timestamp: null }; 
-      } else {
-        // Jika promise gagal (misalnya error jaringan), tandai sebagai 'offline'
-        const { id } = result.reason; // Asumsi error object memiliki ID, mari kita perbaiki
-        // Jika getSmartBoxData di-reject, kita tidak tahu ID-nya. 
-        // Kita harus memproses 'promises' yang asli, bukan 'results'
+        newFleetStatus[id] = data || { id, timestamp: null };
       }
     });
-    
-    // Mari kita gunakan cara yang lebih sederhana dengan 'promises'
-    const settledPromises = await Promise.all(promises);
-    const finalStatus = {};
-    settledPromises.forEach(res => {
-        finalStatus[res.id] = res.data; // res.data bisa undefined jika API gagal/box 404
-    });
 
-    setFleetStatus(finalStatus);
+    setFleetStatus(prev => ({ ...prev, ...newFleetStatus }));
+
     setIsLoading(false);
+    setIsRefreshing(false);
 
-  }, [boxIds, t]); // Hapus 't' jika getLogStatus dipindah
+  }, [boxIds]);
 
-  // Ambil data saat komponen dimuat
   useEffect(() => {
-    fetchFleetData();
-    // Kita hapus interval refresh otomatis agar tidak membanjiri API
-    // Kita akan tambahkan tombol refresh manual
-  }, [fetchFleetData]);
-
-  // --- Render (JSX) ---
+    fetchFleetData(false);
+    if (refreshInterval && refreshInterval > 0) {
+      const intervalId = setInterval(() => {
+        fetchFleetData(true);
+      }, refreshInterval);
+      return () => clearInterval(intervalId);
+    }
+  }, [fetchFleetData, refreshInterval]);
 
   return (
     <div ref={containerRef} className="fleet-table-container">
       <div className="fleet-table-header">
-        <h3>{t('dashboard.fleetTableTitle')}</h3>
-        <button 
-          onClick={fetchFleetData} 
-          disabled={isLoading} 
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <h3>{t('dashboard.fleetTableTitle')}</h3>
+          {isRefreshing && <span style={{ fontSize: '0.8rem', color: '#4FC3F7' }}>Updating...</span>}
+        </div>
+
+        <button
+          onClick={() => fetchFleetData(false)}
+          disabled={isLoading || isRefreshing}
           className="refresh-button"
         >
-          <RefreshCw size={16} className={isLoading ? 'spinning' : ''} />
-          {isLoading ? t('loading', 'Memuat...') : t('refresh', 'Refresh')}
+          <RefreshCw size={16} className={(isLoading || isRefreshing) ? 'spinning' : ''} />
+          {isLoading ? t('loading', 'Memuat...') : t('settings.dataUpdate', 'Refresh')}
         </button>
       </div>
 
@@ -122,6 +107,11 @@ const SmartBoxDataDisplay = ({ boxIds }) => {
           <span>⚠️ {error}</span>
         </div>
       )}
+
+      {/* PETA ARMADA (FLEET MAP) */}
+      <div style={{ marginBottom: '2rem', border: '2px solid rgba(255,255,255,0.2)', borderRadius: '15px', overflow: 'hidden' }}>
+        <FleetMap fleetData={fleetStatus} />
+      </div>
 
       <table className="fleet-table">
         <thead>
@@ -135,58 +125,74 @@ const SmartBoxDataDisplay = ({ boxIds }) => {
           </tr>
         </thead>
         <tbody>
-          {/* Ubah 'boxIds.map' menjadi mapping dari state 'fleetStatus' */}
           {boxIds.map(id => {
-            const log = fleetStatus[id]; // Dapatkan data terbaru untuk ID ini dari state
+            const log = fleetStatus[id];
             const status = getLogStatus(log);
+
+            // Perbaikan URL GMaps yang benar
             const gmapsUrl = (log?.latitude && log?.longitude)
               ? `https://www.google.com/maps?q=${log.latitude},${log.longitude}`
               : "#";
 
             return (
               <tr key={id}>
-                {/* ID Box */}
-                <td><strong>{id}</strong></td>
-                
-                {/* Status */}
+                {/* 1. ID Box  */}
+                <td>
+                  <Link
+                    to={`/dashboard/${id}`}
+                    style={{ color: '#4FC3F7', textDecoration: 'none', fontWeight: 'bold', fontSize: '1.05rem' }}
+                  >
+                    {id} ↗
+                  </Link>
+                </td>
+
+                {/* 2. STATUS (Dikembalikan ke sini!) */}
                 <td>
                   <span className={`status-badge ${status.className}`}>
                     {status.icon}
                     {status.text}
                   </span>
                 </td>
-                
-                {/* Suhu */}
+
+                {/* 3. Suhu */}
                 <td>
                   {typeof log?.temperature === 'number'
                     ? `${convertTemperature(log.temperature).toFixed(2)} ${getTemperatureUnit()}`
                     : '—'}
                 </td>
-                
-                {/* Kelembapan */}
+
+                {/* 4. Kelembapan */}
                 <td>
                   {typeof log?.humidity === 'number'
                     ? `${log.humidity.toFixed(2)} %`
                     : '—'}
                 </td>
-                
-                {/* Lokasi */}
+
+                {/* 5. Lokasi & Link Map */}
                 <td>
-                  <a
-                    href={gmapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`location-link ${gmapsUrl === '#' ? 'disabled' : ''}`}
-                  _>
-                    <MapPin size={16} />
-                    {gmapsUrl !== '#' ? t('viewMap', 'Lihat Peta') : t('na', 'N/A')}
-                  </a>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <a
+                      href={gmapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`location-link ${gmapsUrl === '#' ? 'disabled' : ''}`}
+                    >
+                      <MapPin size={16} />
+                      {gmapsUrl !== '#' ? t('dashboard.table.location', 'Lihat Peta') : 'N/A'}
+                    </a>
+                    {/* Tampilkan koordinat kecil di bawah link */}
+                    {log?.latitude && (
+                      <span style={{ fontSize: '0.75rem', color: '#aaa', marginTop: '4px' }}>
+                        {log.latitude.toFixed(4)}, {log.longitude.toFixed(4)}
+                      </span>
+                    )}
+                  </div>
                 </td>
-                
-                {/* Terakhir Dilihat */}
+
+                {/* 6. Terakhir Dilihat */}
                 <td>
-                  {log?.timestamp 
-                    ? new Date(log.timestamp).toLocaleString("id-ID") 
+                  {log?.timestamp
+                    ? new Date(log.timestamp).toLocaleString("id-ID")
                     : '—'}
                 </td>
               </tr>
@@ -194,8 +200,7 @@ const SmartBoxDataDisplay = ({ boxIds }) => {
           })}
         </tbody>
       </table>
-      
-      {/* Tampilkan pesan loading di bawah tabel */}
+
       {isLoading && <p className="loading-text">{t('loading', 'Mengambil data armada...')}</p>}
 
     </div>
