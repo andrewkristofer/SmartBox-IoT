@@ -8,9 +8,9 @@
  * @copyright Copyright (c) 2025
  *
  * This firmware performs the following key tasks:
- * 1. Reads temperature and humidity from a DHT11 sensor.
+ * 1. Reads temperature and humidity from a DHT22 sensor.
  * 2. Acquires GPS location data from a NEO-6M module.
- * 3. Controls actuators (LEDs, Buzzer, Peltier Cooler) based on sensor thresholds.
+ * 3. Controls actuators (LEDs, Buzzer) based on sensor thresholds.
  * 4. Publishes the collected data to an MQTT broker at a fixed interval.
  * 5. Manages Wi-Fi and MQTT connections with automatic reconnection.
  */
@@ -38,25 +38,24 @@ const char* MQTT_TOPIC  = "smartbox/kelompok11/data"; ///< @brief MQTT topic for
 const char* BOX_ID      = "SMARTBOX-001";             ///< @brief Unique identifier for this device.
 
 // --- System Parameters ---
-const long PUBLISH_INTERVAL_MS = 30000; ///< @brief Data publishing interval (30 seconds).
+const long PUBLISH_INTERVAL_MS = 5000; ///< @brief Data publishing interval (5 seconds).
 
 //==============================================================================
 // SECTION 3: HARDWARE PIN DEFINITIONS
 //==============================================================================
-#define DHT_PIN 4        ///< @brief Pin connected to the DHT11 data line.
+#define DHT_PIN 4        ///< @brief Pin connected to the22 data line.
 #define GPS_RX_PIN 16    ///< @brief ESP32 RX pin, connected to GPS TX.
 #define GPS_TX_PIN 17    ///< @brief ESP32 TX pin, connected to GPS RX.
 #define LED_GREEN_PIN 25 ///< @brief Pin for the green status LED (safe condition).
 #define LED_RED_PIN 26   ///< @brief Pin for the red warning LED (unsafe condition).
 #define BUZZER_PIN 27    ///< @brief Pin for the audible warning buzzer.
-#define PELTIER_PIN 14   ///< @brief Pin to control the Peltier cooler relay.
 
 //==============================================================================
 // SECTION 4: GLOBAL OBJECTS & VARIABLES
 //==============================================================================
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
-DHT dht(DHT_PIN, DHT11);
+DHT dht(DHT_PIN, DHT22);
 HardwareSerial gpsSerial(2); // Use UART2 on ESP32
 TinyGPSPlus gps;
 
@@ -87,7 +86,6 @@ void setup() {
     pinMode(LED_GREEN_PIN, OUTPUT);
     pinMode(LED_RED_PIN, OUTPUT);
     pinMode(BUZZER_PIN, OUTPUT);
-    pinMode(PELTIER_PIN, OUTPUT);
     
     // Initialize sensors
     dht.begin();
@@ -207,13 +205,6 @@ void processConditions(float temp, float hum) {
         digitalWrite(LED_RED_PIN, HIGH);
         digitalWrite(BUZZER_PIN, HIGH);
         Serial.println("WARNING: Conditions are outside safe limits!");
-    }
-
-    // Automatic Cooler Control
-    if (temp > 4.0) {
-        digitalWrite(PELTIER_PIN, HIGH); // Turn cooler ON
-    } else if (temp < 1.0) {
-        digitalWrite(PELTIER_PIN, LOW);  // Turn cooler OFF
     }
 }
 
