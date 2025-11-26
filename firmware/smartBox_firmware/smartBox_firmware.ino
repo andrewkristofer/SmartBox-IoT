@@ -194,7 +194,7 @@ void readSensors(float &temp, float &hum, float &lat, float &lon) {
  */
 void processConditions(float temp, float hum) {
     bool isTempSafe = (temp >= 1.0 && temp <= 4.0);
-    bool isHumidSafe = (hum >= 40.0 && hum <= 60.0);
+    bool isHumidSafe = (hum >= 20.0 && hum <= 60.0);
 
     if (isTempSafe && isHumidSafe) {
         digitalWrite(LED_GREEN_PIN, HIGH);
