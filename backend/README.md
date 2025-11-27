@@ -53,10 +53,11 @@ Buka terminal/command prompt, lalu jalankan perintah berikut:
 ```bash
 cd .\backend\
 python -m pip install -r .\requirements.txt
-
+```
 ### 2. Jalankan Server Utama
 Setelah instalasi selesai, jalankan server dengan perintah:
 
 ```bash
 py .\backend.py
 Server akan aktif dan siap menerima data
+
