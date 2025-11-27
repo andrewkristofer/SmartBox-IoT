@@ -1,3 +1,4 @@
+// src/App.jsx
 import { Routes, Route, useLocation } from "react-router-dom";
 
 import LandingPage from "./pages/LandingPage";
@@ -10,30 +11,32 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import BoxDetailPage from "./pages/BoxDetailPage";
 import AdminPage from "./pages/AdminPage";
+import WaitingApproval from "./pages/WaitingApproval"; 
 
 import { AuthProvider } from "./contexts/AuthContext";
-// 👇 Hapus impor SettingsProvider jika sudah di main.jsx
-// import { SettingsProvider } from "./contexts/SettingsContext";
-
 import "./App.css";
 
 function App() {
   const location = useLocation();
+  
+  // Footer hanya tampil di halaman Landing Page ("/")
   const showFooter = location.pathname === "/";
 
-  // Hapus semua state, ref, effect, dan fungsi yang sudah dipindah
-
   return (
-    <AuthProvider> {/* AuthProvider membungkus semua */}
+    <AuthProvider>
       <div className="app-container">
         <SettingsPanel />
         <Header />
+        
+        {/* --- AREA ROUTING --- */}
+        {/* SEMUA <Route> WAJIB ADA DI DALAM <Routes> */}
         <Routes>
+          {/* 1. Halaman Publik */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
-          {/* 👇 Tambahkan Rute Signup di sini 👇 */}
           <Route path="/signup" element={<SignupPage />} />
-          {/* 👆 Batas Rute Signup 👆 */}
+          
+          {/* 2. Halaman Dashboard Mitra */}
           <Route
             path="/dashboard"
             element={
@@ -42,7 +45,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* <Route path="*" element={<div>404 Not Found</div>} /> */}
           <Route
             path="/dashboard/:boxId"
             element={
@@ -51,29 +53,36 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* 3. Halaman Super Admin */}
+          {/* PINDAHKAN KE SINI (MASUK KE DALAM ROUTES) */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute role="super_admin">
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 4. Halaman Menunggu Approval */}
+          {/* PINDAHKAN KE SINI (MASUK KE DALAM ROUTES) */}
+          <Route
+            path="/waiting-approval"
+            element={
+              <ProtectedRoute>
+                <WaitingApproval />
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
+        {/* --- AKHIR AREA ROUTING --- */}
+
         {showFooter && <Footer />}
       </div>
     </AuthProvider>
   );
-  <Route
-    path="/admin"
-    element={
-      <ProtectedRoute role="super_admin">
-        <AdminPage />
-      </ProtectedRoute>
-    }
-  />
-
-  {/* Rute Penunggu */ }
-  <Route
-    path="/waiting-approval"
-    element={
-      <ProtectedRoute>
-        <WaitingApproval />
-      </ProtectedRoute>
-    }
-  />
 }
 
 export default App;

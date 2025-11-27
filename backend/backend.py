@@ -19,6 +19,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 dotenv_path = os.path.join(script_dir, '..', '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
+# Konfigurasi MQTT & Database
 MQTT_BROKER = os.getenv("MQTT_BROKER", "broker.hivemq.com")
 MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))
 MQTT_TOPIC = os.getenv("MQTT_TOPIC", "smartbox/kelompok11/data")
@@ -37,11 +38,12 @@ def get_db_connection():
     return conn
 
 def initialize_database():
+    """Membuat tabel jika belum ada dan seeding super admin."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Tabel Sensor Data
+        # 1. Tabel Data Sensor
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS smartbox_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +56,7 @@ def initialize_database():
         );
         """)
 
-        # Tabel Users (Updated)
+        # 2. Tabel Users (Akun Login)
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,7 +69,7 @@ def initialize_database():
         );
         """)
 
-        # Tabel Profil Mitra (BARU)
+        # 3. Tabel Profil Mitra (Info Bisnis)
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS mitra_profiles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,10 +85,10 @@ def initialize_database():
         conn.commit()
         print(f"Database '{DB_FILE}' initialized.")
         
-        # SEEDING SUPER ADMIN (Otomatis buat akun Super Admin)
+        # --- SEEDING SUPER ADMIN ---
         try:
             super_pass = generate_password_hash("password123")
-            # Super Admin langsung is_approved=1
+            # Super Admin langsung aktif (is_approved=1)
             cursor.execute("""
                 INSERT INTO users (username, email, password_hash, role, is_approved)
                 VALUES (?, ?, ?, ?, ?)
@@ -94,7 +96,7 @@ def initialize_database():
             conn.commit()
             print("Super Admin account created (User: superadmin, Pass: password123)")
         except sqlite3.IntegrityError:
-            pass 
+            pass # Sudah ada, skip
 
     except sqlite3.Error as e:
         print(f"Database initialization error: {e}")
@@ -102,6 +104,7 @@ def initialize_database():
         if conn: conn.close()
 
 def store_sensor_data(payload: dict):
+    """Menyimpan data sensor dari MQTT ke SQLite."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -123,7 +126,7 @@ def store_sensor_data(payload: dict):
         if conn: conn.close()
 
 # ==============================================================================
-# MQTT CLIENT
+# SECTION 4: MQTT CLIENT
 # ==============================================================================
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -150,13 +153,16 @@ def start_mqtt_listener():
         print(f"MQTT Listener Error: {e}")
 
 # ==============================================================================
-# API SERVER
+# SECTION 5: API SERVER (FLASK)
 # ==============================================================================
 app = Flask(__name__)
 CORS(app)
 
+# --- ENDPOINT DATA UMUM ---
+
 @app.route('/api/data/<string:box_id>', methods=['GET'])
 def get_data_by_box_id(box_id: str):
+    """Mengambil riwayat data sensor untuk satu box tertentu."""
     limit = request.args.get('limit', 100, type=int)
     conn = None
     try:
@@ -173,10 +179,11 @@ def get_data_by_box_id(box_id: str):
     finally:
         if conn: conn.close()
 
-# --- AUTHENTICATION UPDATE ---
+# --- ENDPOINT OTENTIKASI (REGISTER & LOGIN) ---
 
 @app.route('/api/auth/register', methods=['POST'])
 def register_user():
+    """Pendaftaran mitra baru (User + Profil Bisnis)."""
     data = request.get_json()
     
     # Data Akun
@@ -199,7 +206,7 @@ def register_user():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 1. Simpan User (Role default 'admin', status 'pending')
+        # 1. Simpan User (Role default 'admin', status 'pending'/0)
         cursor.execute(
             "INSERT INTO users (username, email, password_hash, role, is_approved) VALUES (?, ?, ?, 'admin', 0)",
             (username, email, password_hash)
@@ -223,6 +230,7 @@ def register_user():
 
 @app.route('/api/auth/login', methods=['POST'])
 def login_user():
+    """Login user dengan pengecekan status approval."""
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
@@ -235,10 +243,12 @@ def login_user():
         user = cursor.fetchone()
 
         if user and check_password_hash(user['password_hash'], password):
-            # CEK APAKAH SUDAH DI-APPROVE
+            
+            # --- CEK STATUS APPROVAL ---
             if user['is_approved'] == 0:
                 return jsonify({"error": "Akun Anda belum disetujui oleh Super Admin."}), 403
 
+            # Generate Token
             token_payload = {
                 'user_id': user['id'],
                 'username': user['username'],
@@ -264,10 +274,11 @@ def login_user():
     finally:
         if conn: conn.close()
 
-# --- SUPER ADMIN FEATURES ---
+# --- ENDPOINT SUPER ADMIN ---
 
 @app.route('/api/admin/users', methods=['GET'])
 def get_pending_users():
+    """Mengambil daftar user yang belum disetujui (is_approved=0)."""
     conn = None
     try:
         conn = get_db_connection()
@@ -290,6 +301,7 @@ def get_pending_users():
 
 @app.route('/api/admin/approve/<int:user_id>', methods=['POST'])
 def approve_user(user_id):
+    """Menyetujui pendaftaran mitra (ubah is_approved jadi 1)."""
     conn = None
     try:
         conn = get_db_connection()
@@ -302,6 +314,27 @@ def approve_user(user_id):
     finally:
         if conn: conn.close()
 
+@app.route('/api/admin/devices', methods=['GET'])
+def get_all_active_devices():
+    """Mengambil SEMUA Box ID yang ada di database (untuk Global Monitoring)."""
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Ambil ID unik dari tabel data sensor
+        cursor.execute("SELECT DISTINCT box_id FROM smartbox_data")
+        rows = cursor.fetchall()
+        # Convert ke list string sederhana: ["SMARTBOX-001", "SMARTBOX-002"]
+        device_ids = [row['box_id'] for row in rows]
+        return jsonify(device_ids)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+# ==============================================================================
+# MAIN EXECUTION
+# ==============================================================================
 if __name__ == '__main__':
     initialize_database()
     
