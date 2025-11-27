@@ -37,6 +37,8 @@ py .\backend.py
 ```
 Server akan aktif dan siap menerima data
 
+---
+
 ## 📡 Simulasi Perangkat (MQTT)
 Apabila Anda ingin mensimulasikan perangkat data Smart Box (tanpa hardware fisik), Anda dapat menjalankan skrip mqtt_simulator.py. Skrip ini akan mengirimkan data dummy (suhu, kelembaban, dan lokasi) ke backend.
 
@@ -46,6 +48,7 @@ Cara menjalankannya: Buka terminal baru (jangan matikan terminal server backend)
 cd .\backend\
 py .\mqtt_simulator.py
 ```
+
 
 
 
