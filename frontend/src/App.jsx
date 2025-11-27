@@ -1,8 +1,9 @@
 // src/App.jsx
 
-// 👇 Hapus useState, useEffect jika tidak dipakai lagi di App.jsx
-// import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react"; // <-- Hapus ini jika belum dihapus
 import { Routes, Route, useLocation } from "react-router-dom";
+// 👇 1. Import Toaster dari react-hot-toast
+import { Toaster } from 'react-hot-toast';
 
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -15,8 +16,8 @@ import Footer from "./components/Footer";
 import BoxDetailPage from "./pages/BoxDetailPage";
 
 import { AuthProvider } from "./contexts/AuthContext";
-// 👇 Hapus impor SettingsProvider jika sudah di main.jsx
-// import { SettingsProvider } from "./contexts/SettingsContext";
+// 👇 2. Import Monitor Notifikasi yang baru dibuat
+import FleetNotificationMonitor from "./components/FleetNotificationMonitor";
 
 import "./App.css";
 
@@ -24,19 +25,31 @@ function App() {
   const location = useLocation();
   const showFooter = location.pathname === "/";
 
-  // Hapus semua state, ref, effect, dan fungsi yang sudah dipindah
-
   return (
     <AuthProvider> {/* AuthProvider membungkus semua */}
+      
+      {/* 👇 3. Pasang Monitor di sini (Di dalam AuthProvider agar bisa akses user login) */}
+      <FleetNotificationMonitor />
+      
+      {/* 👇 4. Pasang Toaster (UI Notifikasi) */}
+      <Toaster 
+        position="bottom-right" // Sesuai permintaan
+        reverseOrder={false}
+        toastOptions={{
+          // Opsi global jika diperlukan
+          style: {
+            zIndex: 9999,
+          },
+        }}
+      />
+
       <div className="app-container">
         <SettingsPanel />
         <Header />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
-          {/* 👇 Tambahkan Rute Signup di sini 👇 */}
           <Route path="/signup" element={<SignupPage />} />
-          {/* 👆 Batas Rute Signup 👆 */}
           <Route
             path="/dashboard"
             element={
@@ -45,7 +58,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* <Route path="*" element={<div>404 Not Found</div>} /> */}
           <Route
             path="/dashboard/:boxId"
             element={

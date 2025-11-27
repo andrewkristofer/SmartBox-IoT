@@ -1854,3 +1854,49 @@ a:focus-visible {
 .back-btn:hover {
   text-decoration: underline;
 }
+
+/* Notification Toast Styles */
+.animate-enter {
+  animation: enter 0.35s ease-out;
+}
+.animate-leave {
+  animation: leave 0.35s ease-in forwards;
+}
+
+@keyframes enter {
+  0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes leave {
+  0% { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(0.9) translateY(20px); }
+}
+
+/* Helper classes untuk custom toast jika tidak pakai Tailwind */
+.bg-white { background-color: white; }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+.rounded-lg { border-radius: 0.5rem; }
+.flex { display: flex; }
+.items-start { align-items: flex-start; }
+.p-4 { padding: 1rem; }
+.ml-3 { margin-left: 0.75rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.font-medium { font-weight: 500; }
+.text-gray-900 { color: #111827; }
+.text-gray-500 { color: #6b7280; }
+.text-red-500 { color: #ef4444; }
+.text-red-400 { color: #f87171; }
+.font-bold { font-weight: 700; }
+.text-xs { font-size: 0.75rem; }
+.w-full { width: 100%; }
+.max-w-md { max-width: 28rem; }
+.cursor-pointer { cursor: pointer; }
+
+/* Pulse animation untuk ikon bahaya */
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+}
