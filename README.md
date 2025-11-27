@@ -17,7 +17,7 @@ Proyek ini dibagi menjadi tiga komponen utama:
 - **`/backend`**: Server Python (Flask) yang menerima data dari perangkat dan menyediakan API.
   - **[Lihat Instruksi Backend](./backend/README.md)**
 - **`/frontend`**: _User Interface_ yang menampilkan status dari Smart Box sekaligus analitik.
-  - **[Lihat Instruksi Backend](./frontend/README.md)**
+  - **[Lihat Instruksi Frontend](./frontend/README.md)**
 
 
 ## Dokumentasi
