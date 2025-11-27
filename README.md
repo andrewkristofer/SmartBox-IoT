@@ -5,8 +5,7 @@ Sistem Penyimpanan dan Transportasi Pintar berbasis IoT untuk mendukung program 
 ## Fitur Utama
 
 - **Pemantauan Real-time**: Monitoring suhu, kelembaban, dan lokasi GPS.
-- **Notifikasi Otomatis**: Peringatan instan jika kondisi keluar dari batas aman.
-- **Kontrol Otomatis**: Sistem pendingin otomatis untuk menjaga suhu optimal.
+- **Notifikasi Otomatis**: Peringatan instan jika kondisi di dalam box keluar dari batas optimal.
 - **Dashboard & Analitik**: Visualisasi data untuk pemangku kepentingan.
 
 ## Struktur Proyek
