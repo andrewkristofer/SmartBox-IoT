@@ -2,38 +2,13 @@
 
 > **Status:** 🚧 Work in Progress (WIP)
 
-**Smart Box IoT** adalah Sistem Penyimpanan dan Transportasi Pintar berbasis IoT untuk mendukung program distribusi pangan yang efisien dan transparan. Backend ini bertugas menerima data sensor, memproses logika notifikasi, dan menyediakan API untuk dashboard.
-
-Proyek ini dikembangkan oleh **Kelompok 11, Fakultas Teknik, Universitas Indonesia**.
-
 ---
 
 ## 📖 Daftar Isi
-- [Fitur Utama](#-fitur-utama)
-- [Struktur Proyek](#-struktur-proyek)
 - [Tech Stack](#-tech-stack)
 - [Instalasi & Menjalankan](#-instalasi--menjalankan-server)
 - [Simulasi Perangkat](#-simulasi-perangkat-mqtt)
-- [Kontak & Kredit](#-kontak--kredit)
 
----
-
-## ✨ Fitur Utama
-
-* **Pemantauan Real-time:** Monitoring suhu, kelembaban, dan lokasi GPS dari perangkat box.
-* **Notifikasi Otomatis:** Peringatan instan jika kondisi di dalam box keluar dari batas optimal (misalnya suhu terlalu tinggi).
-* **Dashboard & Analitik:** Menyediakan endpoint API untuk visualisasi data bagi pemangku kepentingan.
-
----
-
-## 📂 Struktur Proyek
-
-Proyek ini dibagi menjadi dua komponen utama:
-
-1.  **/firmware:** Kode C++/Arduino yang berjalan pada mikrokontroler ESP32 di dalam Smart Box. *(Lihat instruksi khusus di folder firmware)*.
-2.  **/backend:** Server Python (Flask) yang menerima data dari perangkat dan menyediakan API. **(Dokumentasi ini fokus pada bagian backend)**.
-
----
 
 ## 🛠️ Tech Stack
 
@@ -59,5 +34,17 @@ Setelah instalasi selesai, jalankan server dengan perintah:
 
 ```bash
 py .\backend.py
+```
 Server akan aktif dan siap menerima data
+
+## 📡 Simulasi Perangkat (MQTT)
+Apabila Anda ingin mensimulasikan perangkat data Smart Box (tanpa hardware fisik), Anda dapat menjalankan skrip mqtt_simulator.py. Skrip ini akan mengirimkan data dummy (suhu/lokasi) ke backend.
+
+Cara menjalankannya: Buka terminal baru (jangan matikan terminal server backend), lalu jalankan:
+
+```bash
+cd .\backend\
+py .\mqtt_simulator.py
+```
+
 
