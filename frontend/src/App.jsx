@@ -1,7 +1,3 @@
-// src/App.jsx
-
-// 👇 Hapus useState, useEffect jika tidak dipakai lagi di App.jsx
-// import { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 
 import LandingPage from "./pages/LandingPage";
@@ -13,6 +9,7 @@ import SignupPage from "./pages/SignupPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import BoxDetailPage from "./pages/BoxDetailPage";
+import AdminPage from "./pages/AdminPage";
 
 import { AuthProvider } from "./contexts/AuthContext";
 // 👇 Hapus impor SettingsProvider jika sudah di main.jsx
@@ -59,6 +56,24 @@ function App() {
       </div>
     </AuthProvider>
   );
+  <Route
+    path="/admin"
+    element={
+      <ProtectedRoute role="super_admin">
+        <AdminPage />
+      </ProtectedRoute>
+    }
+  />
+
+  {/* Rute Penunggu */ }
+  <Route
+    path="/waiting-approval"
+    element={
+      <ProtectedRoute>
+        <WaitingApproval />
+      </ProtectedRoute>
+    }
+  />
 }
 
 export default App;
