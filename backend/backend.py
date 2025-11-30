@@ -1,13 +1,15 @@
 import sqlite3
 import json
 import time
+import csv
+import io
 import os
 import jwt 
 import datetime 
 from threading import Thread
 from dotenv import load_dotenv 
 import paho.mqtt.client as mqtt
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -327,6 +329,53 @@ def get_all_active_devices():
         # Convert ke list string sederhana: ["SMARTBOX-001", "SMARTBOX-002"]
         device_ids = [row['box_id'] for row in rows]
         return jsonify(device_ids)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+@app.route('/api/export/<string:box_id>', methods=['GET'])
+def export_box_data_csv(box_id):
+    """Generate CSV file dari data sensor box tertentu."""
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT timestamp, temperature, humidity, latitude, longitude FROM smartbox_data WHERE box_id = ? ORDER BY timestamp DESC",
+            (box_id,)
+        )
+        rows = cursor.fetchall()
+
+        # Fungsi Generator untuk streaming CSV
+        def generate():
+            data = io.StringIO()
+            w = csv.writer(data)
+
+            # Tulis Header CSV
+            w.writerow(('Waktu', 'Suhu (°C)', 'Kelembapan (%)', 'Latitude', 'Longitude'))
+            yield data.getvalue()
+            data.seek(0)
+            data.truncate(0)
+
+            # Tulis Data Baris per Baris
+            for row in rows:
+                w.writerow((
+                    row['timestamp'],
+                    row['temperature'],
+                    row['humidity'],
+                    row['latitude'],
+                    row['longitude']
+                ))
+                yield data.getvalue()
+                data.seek(0)
+                data.truncate(0)
+
+        # Return sebagai file attachment
+        response = Response(stream_with_context(generate()), mimetype='text/csv')
+        response.headers.set("Content-Disposition", "attachment", filename=f"{box_id}_report.csv")
+        return response
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:

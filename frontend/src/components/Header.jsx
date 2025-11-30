@@ -1,22 +1,24 @@
 // src/components/Header.jsx
 
 import { useState, useEffect, useContext } from "react";
-// Impor useLocation untuk mendeteksi halaman saat ini
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import SmartBoxLogo from "../assets/smartboxiotlogo.png"; //
-// Impor ikon Home
-import { Menu, X, LogIn, LogOut, Home } from "lucide-react";
+import SmartBoxLogo from "../assets/smartboxiotlogo.png"; 
+// Tambahkan ikon ShieldCheck untuk Admin
+import { Menu, X, LogIn, LogOut, Home, ShieldCheck } from "lucide-react"; 
 import { AuthContext } from "../contexts/AuthContext";
 import { useTranslation } from "react-i18next";
-import "../App.css"; //
+import "../App.css"; 
 
 const Header = () => {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
-  const { isAuthenticated, logout } = useContext(AuthContext);
+  
+  // 1. Ambil currentUser dari Context
+  const { isAuthenticated, logout, currentUser } = useContext(AuthContext); 
+  
   const navigate = useNavigate();
-  const location = useLocation(); // <-- BARU: Dapatkan lokasi saat ini
+  const location = useLocation(); 
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,36 +51,50 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
-  // --- LOGIKA NAVIGASI BARU ---
-  // Definisikan navItems berdasarkan halaman saat ini
+  // --- LOGIKA UTAMA: Cek apakah user adalah Super Admin ---
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+
   let navItems = [];
   
-  // Jika kita di dashboard...
+  // A. Jika di Dashboard (User biasa / Admin lihat dashboard)
   if (location.pathname.startsWith('/dashboard')) {
     navItems = [
-      // Kita hanya tampilkan tombol "Home" untuk kembali ke landing page
-      { id: "home", label: t("header.nav.home", "Home"), isPageLink: true, path: "/" }
+      { id: "home", label: t("header.nav.home", "Home"), isPageLink: true, path: "/" },
+      // Tampilkan tombol Admin JIKA Super Admin
+      ...(isSuperAdmin ? [{ id: "admin", label: t("header.nav.admin"), isPageLink: true, path: "/admin" }] : [])
     ];
   } 
-  // Jika kita di landing page...
+  
+  // B. Jika di Halaman Admin (Khusus Super Admin)
+  else if (location.pathname.startsWith('/admin')) {
+    navItems = [
+      { id: "home", label: t("header.nav.home", "Home"), isPageLink: true, path: "/" },
+      // Super admin mungkin mau lihat dashboard monitoring biasa juga
+      { id: "dashboard", label: t("header.nav.dashboard"), isPageLink: true, path: "/dashboard" }
+    ];
+  }
+
+  // C. Jika di Landing Page
   else if (location.pathname === '/') {
      navItems = [
        { id: "home", label: t("header.nav.what"), isScrollLink: true }, 
        { id: "program", label: t("header.nav.why"), isScrollLink: true },
        { id: "nutrition", label: t("header.nav.how"), isScrollLink: true },
-       // Tampilkan link ke Dashboard jika login
+       
+       // Tampilkan tombol Admin JIKA Super Admin
+       ...(isAuthenticated && isSuperAdmin ? [{ id: "admin", label: t("header.nav.admin"), isPageLink: true, path: "/admin" }] : []),
+       
+       // Tampilkan link ke Dashboard jika login (semua user login bisa lihat dashboard)
        ...(isAuthenticated ? [{ id: "dashboard", label: t("header.nav.dashboard"), isPageLink: true, path: "/dashboard" }] : [])
      ];
   }
-  else if (['/login', '/signup'].includes(location.pathname)) {
-    // Tampilkan tombol Home jika di halaman Login atau Signup
+  
+  // D. Halaman Login/Signup
+  else if (['/login', '/signup', '/waiting-approval'].includes(location.pathname)) {
     navItems = [
        { id: "home", label: t("header.nav.home", "Home"), isPageLink: true, path: "/" }
     ];
   }
-  // Jika di halaman lain (login/signup), navItems akan kosong (tidak menampilkan apa-apa)
-  // --- AKHIR LOGIKA NAVIGASI BARU ---
-
 
  return (
     <header className={`header ${isHeaderScrolled ? "scrolled" : ""}`}>
@@ -90,25 +106,26 @@ const Header = () => {
 
         <ul className={`nav-links ${isMenuOpen ? "active" : ""}`}>
           
-          {/* --- KODE RENDER YANG SEBELUMNYA HILANG --- */}
           {navItems.map((item) => (
              <li key={item.id}>
               {item.isPageLink ? (
-                // Ini untuk link antar halaman (misal: ke /dashboard atau /)
                 <Link to={item.path} onClick={() => setIsMenuOpen(false)} className="nav-button-style">
-                  {/* Tampilkan ikon Home jika id-nya 'home' */}
-                  {item.id === 'home' && <Home size={16} style={{ marginRight: '4px' }} />} 
+                  
+                  {/* Ikon Home */}
+                  {item.id === 'home' && <Home size={16} style={{ marginRight: '6px' }} />} 
+                  
+                  {/* Ikon Admin (BARU) - Biar terlihat beda dan eksklusif */}
+                  {item.id === 'admin' && <ShieldCheck size={16} style={{ marginRight: '6px', color: '#fbbf24' }} />}
+                  
                   {item.label}
                 </Link>
               ) : (
-                // Ini untuk tombol scroll di landing page
                 <button onClick={() => scrollToSection(item.id)}>
                   {item.label}
                 </button>
               )}
             </li>
           ))}
-          {/* --- AKHIR KODE RENDER --- */}
 
            <li>
             {isAuthenticated ? (
@@ -116,7 +133,6 @@ const Header = () => {
                 <LogOut size={16} /> {t("header.nav.logout", "Logout")}
               </button>
             ) : (
-              // Sembunyikan tombol login jika kita sudah di halaman login/signup
               !['/login', '/signup'].includes(location.pathname) && (
                 <button onClick={handleLogin} className="auth-button">
                    <LogIn size={16} /> {t("header.nav.login", "Login")}

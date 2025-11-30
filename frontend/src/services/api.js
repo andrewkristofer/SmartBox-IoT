@@ -86,3 +86,5 @@ export const getPendingUsers = () => {
 export const approveUser = (userId) => {
   return apiFetch(`/api/admin/approve/${userId}`, { method: 'POST' });
 };
+
+export { apiFetch };

@@ -1854,3 +1854,187 @@ a:focus-visible {
 .back-btn:hover {
   text-decoration: underline;
 }
+
+/* --- FLEET TABLE CONTAINER (DIPERBARUI) --- */
+
+.fleet-table-container {
+  margin-top: 3rem;
+  
+  /* Ganti background gelap menjadi Putih dengan nuansa Biru sangat muda */
+  background: #ffffff;
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fbff 100%);
+  
+  padding: 2.5rem; /* Padding sedikit diperbesar agar lega */
+  border-radius: 24px; /* Sudut lebih membulat (modern look) */
+  
+  /* Hapus border-top tebal lama, ganti dengan border halus keliling */
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  
+  /* Shadow biru halus (Elevation effect) */
+  box-shadow: 
+    0 10px 40px -10px rgba(21, 101, 192, 0.1), 
+    0 0 0 1px rgba(21, 101, 192, 0.05);
+
+  width: 100%;
+  position: relative;
+  
+  /* Animasi masuk tetap sama */
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideUpFade 0.8s ease-out 0.2s forwards;
+}
+
+/* Header Section (Judul & Tombol Refresh) */
+.fleet-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9; /* Garis pemisah tipis di bawah judul */
+}
+
+.fleet-table-header h3 {
+  font-size: 1.5rem;
+  /* Ubah warna teks jadi Biru Tua/Gelap agar terbaca di background putih */
+  color: #1e293b; 
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Style Tombol Refresh agar cocok di background terang */
+.refresh-button {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: var(--dark-blue);
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.refresh-button:hover {
+  background: #f0f9ff;
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.refresh-button svg.spinning {
+  animation: spin 1s linear infinite;
+}
+
+.fleet-table {
+  width: 100%;
+  border-collapse: separate; /* Gunakan separate untuk styling border-radius baris */
+  border-spacing: 0; /* Tapi rapatkan jaraknya */
+  /* Ubah warna teks tabel jadi gelap */
+  color: #334155; 
+}
+
+.fleet-table th {
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #94a3b8; /* Abu-abu soft untuk header kolom */
+  background: transparent;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.fleet-table td {
+  padding: 1.2rem 1rem;
+  font-size: 0.95rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.2s;
+}
+
+/* Efek Hover pada Baris Tabel */
+.fleet-table tbody tr:hover td {
+  background: #f8fafc; /* Highlight baris saat di-hover */
+}
+
+/* Hilangkan border bawah pada baris terakhir */
+.fleet-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Link ID Box */
+.fleet-table td a {
+  /* Ubah warna link ID agar kontras */
+  color: var(--dark-blue) !important; 
+  background: #eff6ff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.fleet-table td a:hover {
+  background: var(--primary-blue);
+  color: white !important;
+  text-decoration: none;
+}
+
+/* --- DARK MODE SUPPORT (PENTING) --- */
+/* Agar tetap bagus saat user ganti ke mode gelap */
+
+.dark-mode .fleet-table-container {
+  background: #1e293b; /* Slate-800 */
+  border-color: #334155;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.dark-mode .fleet-table-header h3 {
+  color: #f1f5f9;
+}
+
+.dark-mode .fleet-table-header {
+  border-bottom-color: #334155;
+}
+
+.dark-mode .fleet-table {
+  color: #cbd5e1;
+}
+
+.dark-mode .fleet-table th {
+  color: #64748b;
+  border-bottom-color: #334155;
+}
+
+.dark-mode .fleet-table td {
+  border-bottom-color: #334155;
+}
+
+.dark-mode .fleet-table tbody tr:hover td {
+  background: #0f172a; /* Warna hover lebih gelap */
+}
+
+.dark-mode .refresh-button {
+  background: rgba(255,255,255,0.05);
+  border-color: #475569;
+  color: #cbd5e1;
+}
+
+.dark-mode .refresh-button:hover {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
