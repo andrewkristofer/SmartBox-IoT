@@ -80,6 +80,7 @@
       "why": "Mengapa",
       "how": "Bagaimana",
       "dashboard": "Dashboard",
+      "admin": "Admin Panel",
       "home": "Home",
       "login": "Login",
       "logout": "Logout"
@@ -103,7 +104,8 @@
       "temp": "Suhu",
       "humidity": "Kelembapan",
       "location": "Lokasi",
-      "lastSeen": "Terakhir Dilihat"
+      "lastSeen": "Terakhir Dilihat",
+      "action": "Aksi"
     }
   },
   "status": {
@@ -156,5 +158,33 @@
     "chartHum": "Kelembapan (%)",
     "safeMax": "Maks Aman",
     "safeMin": "Min Aman"
+  },
+  "admin": {
+    "title": "Command Center",
+    "stats": {
+      "totalFleet": "Total Armada",
+      "requests": "Permintaan Mitra",
+      "system": "Status Sistem",
+      "online": "ONLINE"
+    },
+    "tabs": {
+      "monitoring": "Monitoring Global",
+      "approval": "Persetujuan Mitra"
+    },
+    "monitoring": {
+      "empty": "Belum ada perangkat yang terdaftar di database."
+    },
+    "approval": {
+      "title": "Permintaan Mitra Baru",
+      "empty": "Tidak ada permintaan pendaftaran baru saat ini.",
+      "noBusinessName": "Tanpa Nama Usaha",
+      "user": "Pengguna",
+      "type": "Tipe",
+      "address": "Alamat",
+      "approve": "Setujui",
+      "confirm": "Setujui akun mitra \"{{username}}\"?",
+      "success": "Sukses! Akun {{username}} telah aktif.",
+      "fail": "Gagal menyetujui: "
+    }
   }
 }

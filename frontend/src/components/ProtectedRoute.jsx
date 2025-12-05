@@ -1,23 +1,33 @@
 // src/components/ProtectedRoute.jsx
-
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-// 👇 Impor useAuth hook
 import { useAuth } from '../contexts/AuthContext';
 
-const ProtectedRoute = ({ children }) => {
-  // 👇 Gunakan useAuth untuk mendapatkan status login
-  const { isAuthenticated } = useAuth();
-  const location = useLocation(); // Opsional: untuk menyimpan lokasi asal
+const ProtectedRoute = ({ children, role }) => {
+  const { isAuthenticated, currentUser } = useAuth();
+  const location = useLocation();
 
+  // 1. Belum Login -> Lempar ke Login
   if (!isAuthenticated) {
-    // Jika belum login, arahkan ke halaman login
-    // state={{ from: location }} berguna jika Anda ingin kembali ke halaman
-    // dashboard setelah login berhasil, tapi ini opsional.
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // Jika sudah login, tampilkan komponen anak (DashboardPage)
+  // 2. Butuh Role Khusus (misal Super Admin) tapi user bukan itu -> Lempar ke Dashboard
+  if (role && currentUser?.role !== role) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // 3. User Biasa tapi BELUM APPROVE? -> Lempar ke Waiting Room (kecuali jika dia memang mau ke waiting room)
+  // Perhatikan logika ini agar tidak infinite loop
+  if (currentUser?.role === 'admin' && location.pathname !== '/waiting-approval') {
+      // Kita asumsikan ada flag di currentUser atau kita cek saat login
+      // Untuk simplifikasi demo: Jika login berhasil tapi backend bilang "belum approve" (biasanya dihandle di login), 
+      // tapi kalau sudah lolos login, biasanya sudah approved.
+      
+      // NAMUN, jika Anda ingin flow register -> langsung login (state belum approve):
+      // Kita butuh flag `is_approved` di object currentUser
+  }
+
   return children;
 };
 

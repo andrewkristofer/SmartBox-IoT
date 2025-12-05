@@ -1,36 +1,31 @@
 // frontend/src/services/api.js
 
 // 1. Ambil URL backend dari file .env
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// Hapus trailing slash jika ada agar konsisten
+const BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/$/, '');
 
-console.log("Base URL:", import.meta.env.VITE_API_BASE_URL);
-
-// 2. Helper untuk mengambil token dari localStorage (yang disimpan oleh AuthContext)
+// 2. Helper untuk mengambil token dari localStorage
 const getAuthToken = () => {
   return localStorage.getItem('authToken');
 };
 
 /**
  * Fungsi inti untuk semua panggilan API.
- * Fungsi ini akan otomatis menambahkan token JWT ke header jika ada.
  */
 const apiFetch = async (endpoint, options = {}) => {
-  const url = `${BASE_URL}${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${BASE_URL}${cleanEndpoint}`;
   const token = getAuthToken();
 
-  // Siapkan headers default
   const headers = {
     'Content-Type': 'application/json',
-    ...options.headers, // Timpa dengan header kustom jika ada
+    ...options.headers,
   };
 
-  // Jika token ada, tambahkan ke header Authorization
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
-    // (Catatan: Backend Python Anda mungkin perlu diupdate untuk membaca header ini)
   }
 
-  // Gabungkan semua opsi
   const config = {
     ...options,
     headers,
@@ -38,28 +33,28 @@ const apiFetch = async (endpoint, options = {}) => {
 
   try {
     const response = await fetch(url, config);
+    
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+       const text = await response.text();
+       throw new Error(`Server Error (${response.status}): ${text.substring(0, 100)}`);
+    }
+
     const data = await response.json();
 
     if (!response.ok) {
-      // Lemparkan error agar bisa ditangkap oleh .catch() di komponen
       throw new Error(data.error || `HTTP error! status: ${response.status}`);
     }
 
     return data;
   } catch (err) {
     console.error(`API Fetch Error (${endpoint}):`, err.message);
-    throw err; // Lemparkan lagi agar komponen tahu ada error
+    throw err;
   }
 };
 
-// --- Ekspor fungsi-fungsi spesifik untuk komponen ---
+// --- FUNGSI AUTH ---
 
-/**
- * Melakukan login user.
- * @param {string} username
- * @param {string} password
- * @returns {Promise<object>} Data (termasuk token dan user)
- */
 export const loginUser = (username, password) => {
   return apiFetch('/api/auth/login', {
     method: 'POST',
@@ -67,27 +62,29 @@ export const loginUser = (username, password) => {
   });
 };
 
-/**
- * Mendaftarkan user baru.
- * @param {object} signupData - { username, email, password }
- * @returns {Promise<object>} Pesan sukses
- */
 export const registerUser = (signupData) => {
   return apiFetch('/api/auth/register', {
     method: 'POST',
-    body: JSON.stringify(signupData),
+    body: JSON.stringify(signupData), // Mengirim data lengkap (termasuk profil mitra)
   });
 };
 
-/**
- * Mengambil data Smart Box terbaru (permintaan aman).
- * @param {string} boxId
- * @param {number} limit
- * @returns {Promise<array>} Array berisi data log
- */
+// --- FUNGSI DATA ---
+
 export const getSmartBoxData = (boxId, limit = 6) => {
-  // apiFetch akan otomatis menambahkan token ke permintaan ini
   return apiFetch(`/api/data/${boxId}?limit=${limit}`, {
     method: 'GET',
   });
 };
+
+// --- FUNGSI SUPER ADMIN (WAJIB ADA UNTUK ADMIN PAGE) ---
+
+export const getPendingUsers = () => {
+  return apiFetch('/api/admin/users', { method: 'GET' });
+};
+
+export const approveUser = (userId) => {
+  return apiFetch(`/api/admin/approve/${userId}`, { method: 'POST' });
+};
+
+export { apiFetch };
