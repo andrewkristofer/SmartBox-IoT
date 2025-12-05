@@ -40,6 +40,7 @@
       "why": "Why",
       "how": "How",
       "dashboard": "Dashboard",
+      "admin": "Admin Panel",
       "home": "Home",
       "login": "Login",
       "logout": "Logout"
@@ -62,7 +63,8 @@
       "temp": "Temp.",
       "humidity": "Humidity",
       "location": "Location",
-      "lastSeen": "Last Seen"
+      "lastSeen": "Last Seen",
+      "action": "Action"
     }
   },
   "status": {
@@ -139,5 +141,33 @@
     "chartHum": "Humidity (%)",
     "safeMax": "Max Safe",
     "safeMin": "Min Safe"
+  },
+  "admin": {
+    "title": "Command Center",
+    "stats": {
+      "totalFleet": "Total Fleet",
+      "requests": "Partner Requests",
+      "system": "System Status",
+      "online": "ONLINE"
+    },
+    "tabs": {
+      "monitoring": "Global Monitoring",
+      "approval": "Partner Approval"
+    },
+    "monitoring": {
+      "empty": "No devices registered in the database yet."
+    },
+    "approval": {
+      "title": "New Partner Requests",
+      "empty": "No new registration requests at the moment.",
+      "noBusinessName": "No Business Name",
+      "user": "User",
+      "type": "Type",
+      "address": "Address",
+      "approve": "Approve",
+      "confirm": "Approve partner account \"{{username}}\"?",
+      "success": "Success! Account {{username}} is now active.",
+      "fail": "Failed to approve: "
+    }
   }
 }
