@@ -1,5 +1,9 @@
 // src/App.jsx
+
+// import { useState, useEffect } from "react"; // <-- Hapus ini jika belum dihapus
 import { Routes, Route, useLocation } from "react-router-dom";
+// 👇 1. Import Toaster dari react-hot-toast
+import { Toaster } from 'react-hot-toast';
 
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -14,6 +18,9 @@ import AdminPage from "./pages/AdminPage";
 import WaitingApproval from "./pages/WaitingApproval"; 
 
 import { AuthProvider } from "./contexts/AuthContext";
+// 👇 2. Import Monitor Notifikasi yang baru dibuat
+import FleetNotificationMonitor from "./components/FleetNotificationMonitor";
+
 import "./App.css";
 
 function App() {
@@ -24,6 +31,23 @@ function App() {
 
   return (
     <AuthProvider>
+    <AuthProvider> {/* AuthProvider membungkus semua */}
+      
+      {/* 👇 3. Pasang Monitor di sini (Di dalam AuthProvider agar bisa akses user login) */}
+      <FleetNotificationMonitor />
+      
+      {/* 👇 4. Pasang Toaster (UI Notifikasi) */}
+      <Toaster 
+        position="bottom-right" // Sesuai permintaan
+        reverseOrder={false}
+        toastOptions={{
+          // Opsi global jika diperlukan
+          style: {
+            zIndex: 9999,
+          },
+        }}
+      />
+
       <div className="app-container">
         <SettingsPanel />
         <Header />

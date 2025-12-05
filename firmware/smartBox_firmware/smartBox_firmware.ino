@@ -38,7 +38,7 @@ const char* MQTT_TOPIC  = "smartbox/kelompok11/data"; ///< @brief MQTT topic for
 const char* BOX_ID      = "SMARTBOX-001";             ///< @brief Unique identifier for this device.
 
 // --- System Parameters ---
-const long PUBLISH_INTERVAL_MS = 3000; ///< @brief Data publishing interval (30 seconds).
+const long PUBLISH_INTERVAL_MS = 5000; ///< @brief Data publishing interval (5 seconds).
 
 //==============================================================================
 // SECTION 3: HARDWARE PIN DEFINITIONS
