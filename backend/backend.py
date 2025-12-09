@@ -24,7 +24,7 @@ load_dotenv(dotenv_path=dotenv_path)
 # Konfigurasi MQTT & Database
 MQTT_BROKER = os.getenv("MQTT_BROKER", "broker.hivemq.com")
 MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))
-MQTT_TOPIC = os.getenv("MQTT_TOPIC", "smartbox/kelompok11/data")
+MQTT_TOPIC = os.getenv("MQTT_TOPIC", "smartbox/11/secret45582/data")
 API_PORT = int(os.getenv("API_PORT", 5000))
 DB_FILE_NAME = os.getenv("DB_FILE", "smartbox_data.db")
 DB_FILE = os.path.join(script_dir, DB_FILE_NAME)
@@ -180,6 +180,41 @@ def get_data_by_box_id(box_id: str):
         return jsonify({"error": str(e)}), 500
     finally:
         if conn: conn.close()
+
+@app.route('/api/data/<string:box_id>/range', methods=['GET'])
+def get_data_by_time_range(box_id: str):
+    """Mengambil data berdasarkan rentang menit terakhir (timestamp-based filtering)."""
+    minutes = request.args.get('minutes', type=int, default=10)
+
+    # Hitung timestamp sejak X menit lalu
+    cutoff = datetime.datetime.utcnow() - datetime.timedelta(minutes=minutes)
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT * FROM smartbox_data
+            WHERE box_id = ?
+              AND timestamp >= ?
+            ORDER BY timestamp ASC
+            """,
+            (box_id, cutoff.strftime("%Y-%m-%d %H:%M:%S"))
+        )
+
+        rows = cursor.fetchall()
+        data = [dict(row) for row in rows]
+
+        return jsonify(data)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        if conn: conn.close()
+
 
 # --- ENDPOINT OTENTIKASI (REGISTER & LOGIN) ---
 
@@ -353,15 +388,30 @@ def export_box_data_csv(box_id):
             w = csv.writer(data)
 
             # Tulis Header CSV
-            w.writerow(('Waktu', 'Suhu (°C)', 'Kelembapan (%)', 'Latitude', 'Longitude'))
+            w.writerow(('Waktu (WIB)', 'Suhu (°C)', 'Kelembapan (%)', 'Latitude', 'Longitude'))
             yield data.getvalue()
             data.seek(0)
             data.truncate(0)
 
             # Tulis Data Baris per Baris
             for row in rows:
+                # --- LOGIKA KONVERSI WAKTU (BARU) ---
+                try:
+                    # 1. Parse string waktu dari database (UTC)
+                    # Format SQLite default: "YYYY-MM-DD HH:MM:SS"
+                    dt_utc = datetime.datetime.strptime(row['timestamp'], "%Y-%m-%d %H:%M:%S")
+                    
+                    # 2. Tambah 7 Jam untuk WIB
+                    dt_wib = dt_utc + datetime.timedelta(hours=7)
+                    
+                    # 3. Format kembali jadi string
+                    final_timestamp = dt_wib.strftime("%Y-%m-%d %H:%M:%S")
+                except Exception:
+                    # Fallback jika format error, pakai data asli
+                    final_timestamp = row['timestamp']
+
                 w.writerow((
-                    row['timestamp'],
+                    final_timestamp,  # Gunakan waktu yang sudah dikonversi
                     row['temperature'],
                     row['humidity'],
                     row['latitude'],

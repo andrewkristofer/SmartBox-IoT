@@ -7,7 +7,7 @@ import sys
 # ================= KONFIGURASI =================
 BROKER = "broker.hivemq.com"
 PORT = 1883
-TOPIC = "smartbox/kelompok11/data"
+TOPIC = "smartbox/11/secret45582/data"
 
 # ================= LOGIKA SIMULATOR =================
 
