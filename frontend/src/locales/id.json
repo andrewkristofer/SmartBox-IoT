@@ -176,7 +176,9 @@
       "type": "Tipe",
       "address": "Alamat",
       "approve": "Setujui",
+      "reject": "Tolak",
       "confirm": "Setujui akun mitra \"{{username}}\"?",
+      "successReject": "Akun {{username}} telah ditolak dan dihapus.",
       "success": "Sukses! Akun {{username}} telah aktif.",
       "fail": "Gagal menyetujui: "
     }

@@ -165,8 +165,10 @@
       "type": "Type",
       "address": "Address",
       "approve": "Approve",
+      "reject": "Reject",
       "confirm": "Approve partner account \"{{username}}\"?",
       "success": "Success! Account {{username}} is now active.",
+      "successReject": "Account {{username}} rejected and deleted.",
       "fail": "Failed to approve: "
     }
   }

@@ -87,4 +87,8 @@ export const approveUser = (userId) => {
   return apiFetch(`/api/admin/approve/${userId}`, { method: 'POST' });
 };
 
+export const rejectUser = (userId) => {
+  return apiFetch(`/api/admin/reject/${userId}`, { method: 'DELETE' });
+};
+
 export { apiFetch };

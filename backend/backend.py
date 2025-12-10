@@ -283,7 +283,11 @@ def login_user():
             
             # --- CEK STATUS APPROVAL ---
             if user['is_approved'] == 0:
-                return jsonify({"error": "Akun Anda belum disetujui oleh Super Admin."}), 403
+                return jsonify({"error": "Akun Anda sedang dalam peninjauan (Pending)."}), 403
+            
+            # --- CEK STATUS REJECTED (LOGIKA BARU) ---
+            if user['is_approved'] == -1:
+                return jsonify({"error": "Mohon maaf, pendaftaran akun Anda telah DITOLAK oleh Admin."}), 403
 
             # Generate Token
             token_payload = {
@@ -346,6 +350,24 @@ def approve_user(user_id):
         cursor.execute("UPDATE users SET is_approved = 1 WHERE id = ?", (user_id,))
         conn.commit()
         return jsonify({"message": f"User ID {user_id} approved successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+@app.route('/api/admin/reject/<int:user_id>', methods=['DELETE']) # Tetap DELETE di frontend tidak apa-apa, tapi logic di sini UPDATE
+def reject_user(user_id):
+    """Menolak pendaftaran mitra (Ubah status jadi -1)."""
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # JANGAN HAPUS, TAPI UBAH STATUS JADI -1
+        cursor.execute("UPDATE users SET is_approved = -1 WHERE id = ?", (user_id,))
+        
+        conn.commit()
+        return jsonify({"message": f"User ID {user_id} has been rejected."}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
