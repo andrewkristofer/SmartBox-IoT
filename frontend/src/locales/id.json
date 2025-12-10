@@ -38,7 +38,7 @@
   },
   "status": {
     "safe": "Aman",
-    "danger": "Bahaya",
+    "danger": "Warning",
     "offline": "Offline",
     "noData": "Belum Ada Data"
   },
@@ -107,12 +107,6 @@
       "lastSeen": "Terakhir Dilihat",
       "action": "Aksi"
     }
-  },
-  "status": {
-    "safe": "Aman",
-    "danger": "Bahaya",
-    "offline": "Offline",
-    "noData": "Belum Ada Data"
   },
 
   "login": {

@@ -69,7 +69,7 @@
   },
   "status": {
     "safe": "Safe",
-    "danger": "Danger",
+    "danger": "Warning",
     "offline": "Offline",
     "noData": "No Data Yet"
   },
