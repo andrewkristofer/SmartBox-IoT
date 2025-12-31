@@ -25,7 +25,7 @@ Proyek ini dibagi menjadi tiga komponen utama:
 Dokumentasi ini sekaligus menjadi panduan untuk menggunakan Dashboard Smart Box IoT
 - **Landing Page**
   
-  Landing Page ini berisi penjelasan tentang apa itu Smart Box IoT, mengapa kita perlu Smart Box IoT, dan bagaimana Smart Box IoT dapat meningkatkan kualitas distribusi dan penyimpanan pangan
+  Landing Page ini berisi penjelasan tentang apa itu Smart Box IoT, mengapa Smart Box IoT diperlukan, dan bagaimana Smart Box IoT dapat meningkatkan kualitas distribusi dan penyimpanan pangan
   <img width="1901" height="910" alt="image" src="https://github.com/user-attachments/assets/a8834ae6-d3e0-4652-8a77-30624d16bc86" />
   <img width="1901" height="910" alt="image" src="https://github.com/user-attachments/assets/07d56161-49eb-4fd2-ae17-57aa0a1f2a54" />
   <img width="1901" height="910" alt="image" src="https://github.com/user-attachments/assets/096c9b2d-fb4d-4dbb-bd2c-6e5843b2f4fe" />
@@ -35,12 +35,27 @@ Dokumentasi ini sekaligus menjadi panduan untuk menggunakan Dashboard Smart Box 
   <img width="1899" height="886" alt="image" src="https://github.com/user-attachments/assets/879a7a9c-46b9-47b4-b28d-70002b9b44ad" />
   Lalu tekan tombol "Daftar di sini" yang berada di bawah tombol "Masuk" 
   <img width="1919" height="886" alt="image" src="https://github.com/user-attachments/assets/7e2d7508-783e-4c24-84d3-27c5e6ad9368" />
-  Selanjutnya isi data yang diminta untuk registrasi akun admin, setelah sudah mengisi data dengan lengkap dan sesuai, tekan tombol "Daftar"
+  Selanjutnya isi data yang diminta untuk registrasi akun admin, setelah mengisi data dengan lengkap dan sesuai, tekan tombol "Daftar"
   <img width="1899" height="896" alt="image" src="https://github.com/user-attachments/assets/0bc2f794-bfe9-424e-85e9-690556cca69f" />
   Tunggu sampai akun anda di_Approve_ dan diaktifkan oleh Super Admin, setelah akun anda aktif, anda bisa langsung login ke Dashboard Admin
 - **Login ke Admin Dashboard**
   
-  Jika akun sudah aktif, anda bisa langsung Login ke Admin Dashboard dengan menekan tombol Login di Landing Page lalu isi Nama Pengguna dan Sandi dengan yang sudah anda buat sebelumnya
+  Jika akun sudah aktif, anda bisa langsung Login ke Admin Dashboard dengan menekan tombol Login di Landing Page, lalu isi Nama Pengguna dan Sandi dengan yang sudah anda buat sebelumnya
   <img width="1919" height="910" alt="image" src="https://github.com/user-attachments/assets/ca83d97f-9741-4be4-9aae-ba1ef09f230a" />
-  Lalu tekan tombol "Masuk" untuk masuk ke Admin Dashboard
-- **
+  Selanjutnya, tekan tombol "Masuk" untuk menggunakan Admin Dashboard
+- **Admin Dashboard**
+
+  Di sini, anda sebagai admin dapat memonitor kondisi box-box penyimpanan (suhu dan kelembapan di dalam box) anda secara realtime 24/7
+
+  Pada page Satus Armada Langsung ini, anda bisa melihat status semua box, status yang bisa dilihat antara lain adalah Suhu, Kelembapan, dan Koordinat lokasi terakhir box secara realtime.
+  <img width="1900" height="910" alt="image" src="https://github.com/user-attachments/assets/4834df50-d3d7-406b-a1c9-85f8d3898ddb" />
+  Dashboard juga akan memberikan notifikasi jika ada kondisi box yang keluar dari threshold yang sudah ditetapkan
+  <img width="1900" height="910" alt="image" src="https://github.com/user-attachments/assets/9aad9d1e-2cc9-440d-8ed7-5ac3e430eb96" />
+  Anda bisa melihat grafik riwayat kondisi masing-masing box dengan menekan nama boxnya
+  <img width="1900" height="910" alt="image" src="https://github.com/user-attachments/assets/1f62abf5-0dbd-4979-91f9-9119f583d839" />
+  Anda juga bisa mengunduh riwayat kondisi masing-masing box dalam format Excel dengan menekan tombol "Export CSV" di kanan atas halaman detail masing-masing box
+  <img width="1900" height="910" alt="image" src="https://github.com/user-attachments/assets/04fae554-08bc-477c-9b0f-2d54cb86a3b6" />
+  Berikut adalah hasil Export riwayat kondisi salah satu box yang dimonitor di Dashboard Smart Box IoT
+  <img width="1919" height="1018" alt="image" src="https://github.com/user-attachments/assets/c0d0381c-4dd4-49b1-888c-c739d2531404" />
+
+- sd
