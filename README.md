@@ -1,6 +1,6 @@
-# Smart Box IoT (Work in Progress)
+# Smart Box IoT
 
-Sistem Penyimpanan dan Transportasi Pintar berbasis IoT untuk mendukung program distribusi pangan yang efisien dan transparan. Proyek ini dikembangkan oleh Kelompok 11, Fakultas Teknik, Universitas Indonesia.
+Sistem Penyimpanan dan Monitoring Pintar berbasis IoT untuk mendukung program distribusi pangan yang efisien dan transparan. Proyek ini dikembangkan oleh Kelompok 11, Fakultas Teknik, Universitas Indonesia.
 
 ## Fitur Utama
 
@@ -64,10 +64,12 @@ Dokumentasi ini sekaligus menjadi panduan untuk menggunakan Dashboard Smart Box 
   Berikut adalah hasil Export riwayat kondisi salah satu box yang dimonitor di Dashboard Smart Box IoT
   <img width="1919" height="1018" alt="image" src="https://github.com/user-attachments/assets/c0d0381c-4dd4-49b1-888c-c739d2531404" />
 
-Smart Box IoT juga memiliki sistem peringatan pada hardwarenya. Dengan menggunakan LED dan Buzzer, ketika kondisi box keluar dari threshold LED akan berubah dari Hijau menjadi Merah, dan jika kondisi box tidak kembali kedalam threshold selama dua menit, buzzer akan menyala selama satu menit untuk memperingatkan petugas yang berada di sekitar boxn dan juga memudahkan identifikasi box mana yang keluar dari threshold 
+Smart Box IoT juga memiliki sistem peringatan pada hardwarenya. Dengan menggunakan LED dan Buzzer, ketika kondisi box keluar dari threshold LED akan berubah dari Hijau menjadi Merah, dan jika kondisi box tidak kembali kedalam threshold selama dua menit, buzzer akan menyala selama satu menit untuk memperingatkan petugas yang berada di sekitar box dan juga memudahkan identifikasi box mana yang keluar dari threshold 
 - **Lampu indikator Hijau menyala, menandakan sistem berjalan normal. Buzzer dalam keadaan mati"
   <img width="1024" height="863" alt="image" src="https://github.com/user-attachments/assets/701f873e-80d1-47a4-af07-aedde59273ef" />
 - **Sistem segera mematikan LED Hijau dan menyalakan lampu LED Merah. Buzzer aktif sesuai dengan pola peringatan (menyala satu menit setelah keluar dari threshold 2 menit) untuk memberikan peringatan audio kepada petugas**
-<img width="976" height="850" alt="image" src="https://github.com/user-attachments/assets/b8188fef-a7be-47aa-b364-9b36dd4d11fe" />
+  <img width="976" height="850" alt="image" src="https://github.com/user-attachments/assets/b8188fef-a7be-47aa-b364-9b36dd4d11fe" />
+
+Proyek Smart Box IoT ini masih terus dikembangkan dan terbuka untuk penyempurnaan ke depannya. Semoga dokumentasi ini bisa membantu memahami alur sistem, fitur, dan cara penggunaan dashboard. Kalau nemu bug, punya saran, atau ide pengembangan baru, feel free buat eksplor dan diskusi. Terima kasih sudah mampir dan mencoba Smart Box IoT 🙌
 
 
