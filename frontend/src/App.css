@@ -111,8 +111,7 @@ body {
   display: flex;
   list-style: none;
   gap: 2rem;
-  align-items: center;
-  /* Pastikan ini ada */
+  align-items: center; /* Pastikan ini ada */
 }
 
 .nav-links button {
@@ -128,56 +127,47 @@ body {
   border: 1px solid transparent;
   position: relative;
   overflow: hidden;
-
-  display: inline-flex;
-  /* <- Harus ada di sini */
-  align-items: center;
-  /* <- Harus ada di sini */
+  
+  display: inline-flex; /* <- Harus ada di sini */
+  align-items: center; /* <- Harus ada di sini */
 }
 
 .auth-button {
   /* Reset style bawaan button */
-  background: rgba(255, 255, 255, 0.15);
-  /* Latar transparan elegan */
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  /* Border tipis */
+  background: rgba(255, 255, 255, 0.15); /* Latar transparan elegan */
+  border: 1px solid rgba(255, 255, 255, 0.4); /* Border tipis */
   color: white;
-
+  
   /* Ukuran & Layout */
   padding: 0.5rem 1.2rem;
-  border-radius: 50px;
-  /* Pill shape */
+  border-radius: 50px; /* Pill shape */
   font-size: 0.9rem;
   font-weight: 600;
-
+  
   /* Flexbox untuk sejajarkan Ikon & Teks */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-
+  
   /* Reset Margin & Text Case (Ini perbaikan utamanya) */
-  margin-top: 0 !important;
-  /* Hapus margin atas biar sejajar */
-  text-transform: capitalize;
-  /* Biar tidak CAPS LOCK semua */
-
+  margin-top: 0 !important; /* Hapus margin atas biar sejajar */
+  text-transform: capitalize; /* Biar tidak CAPS LOCK semua */
+  
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .auth-button:hover {
   background: white;
-  color: var(--dark-blue);
-  /* Warna teks berubah jadi biru saat hover */
+  color: var(--dark-blue); /* Warna teks berubah jadi biru saat hover */
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 /* Penyesuaian ikon di dalam tombol */
 .auth-button svg {
-  stroke-width: 2.5px;
-  /* Ikon sedikit lebih tebal */
+  stroke-width: 2.5px; /* Ikon sedikit lebih tebal */
 }
 
 .nav-links button::before {
@@ -307,7 +297,7 @@ body {
   width: 100%;
 }
 
-.section>* {
+.section > * {
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -398,7 +388,7 @@ body {
   background: white;
   padding: 2rem;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   border-top: 5px solid var(--dark-blue);
   opacity: 0;
@@ -449,7 +439,7 @@ body {
 
 .info-card:hover {
   transform: translateY(-15px) scale(1.02);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.2);
   border-top-color: var(--primary-blue);
 }
 
@@ -542,7 +532,7 @@ body {
   background: white;
   padding: 2rem;
   border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
   text-align: center;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0;
@@ -580,7 +570,7 @@ body {
 
 .feature-card:hover {
   transform: translateY(-10px) scale(1.03);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
   background: linear-gradient(135deg, #E3F2FD, white);
   border-color: var(--primary-blue);
 }
@@ -759,7 +749,7 @@ body {
 /* Live Data Display */
 .live-data-container {
   margin-top: 5rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0,0,0,0.2);
   padding: 2rem;
   border-radius: 15px;
   border-top: 2px solid var(--primary-blue);
@@ -990,7 +980,6 @@ body {
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
@@ -1001,7 +990,6 @@ body {
     opacity: 0;
     transform: translateY(40px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1013,7 +1001,6 @@ body {
     opacity: 0;
     transform: translateY(30px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1025,7 +1012,6 @@ body {
     opacity: 0;
     transform: translateY(-30px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1037,7 +1023,6 @@ body {
     opacity: 0;
     transform: translateX(-50px);
   }
-
   to {
     opacity: 1;
     transform: translateX(0);
@@ -1049,7 +1034,6 @@ body {
     opacity: 0;
     transform: translateX(50px);
   }
-
   to {
     opacity: 1;
     transform: translateX(0);
@@ -1057,24 +1041,18 @@ body {
 }
 
 @keyframes float-ice {
-
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0px);
   }
-
   50% {
     transform: translateY(-20px);
   }
 }
 
 @keyframes pulse {
-
-  0%,
-  100% {
+  0%, 100% {
     transform: scale(1);
   }
-
   50% {
     transform: scale(1.05);
   }
@@ -1084,35 +1062,27 @@ body {
   0% {
     box-shadow: 0 0 0 0 rgba(79, 195, 247, 0.7);
   }
-
   70% {
     box-shadow: 0 0 0 15px rgba(79, 195, 247, 0);
   }
-
   100% {
     box-shadow: 0 0 0 0 rgba(79, 195, 247, 0);
   }
 }
 
 @keyframes pulse-status {
-
-  0%,
-  100% {
+  0%, 100% {
     box-shadow: 0 0 15px rgba(79, 195, 247, 0.6);
   }
-
   50% {
     box-shadow: 0 0 25px rgba(79, 195, 247, 1);
   }
 }
 
 @keyframes pulse-danger {
-
-  0%,
-  100% {
+  0%, 100% {
     box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
   }
-
   50% {
     box-shadow: 0 0 25px rgba(239, 68, 68, 1);
   }
@@ -1123,12 +1093,10 @@ body {
     opacity: 0;
     transform: translateY(40px) scale(0.9);
   }
-
   60% {
     opacity: 1;
     transform: translateY(-10px) scale(1.05);
   }
-
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1140,12 +1108,10 @@ body {
     opacity: 0;
     transform: translateY(40px) rotateX(20deg);
   }
-
   60% {
     opacity: 1;
     transform: translateY(-5px) rotateX(-5deg);
   }
-
   100% {
     opacity: 1;
     transform: translateY(0) rotateX(0);
@@ -1157,11 +1123,9 @@ body {
     opacity: 0;
     transform: translateY(40px) scale(0.8);
   }
-
   50% {
     transform: translateY(-8px) scale(1.1);
   }
-
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1173,11 +1137,9 @@ body {
     opacity: 0;
     transform: translateY(30px) scale(0.95);
   }
-
   60% {
     transform: translateY(-5px) scale(1.02);
   }
-
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -1189,7 +1151,6 @@ body {
     opacity: 0;
     transform: translateY(-20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1200,7 +1161,6 @@ body {
   0% {
     background-position: -1000px 0;
   }
-
   100% {
     background-position: 1000px 0;
   }
@@ -1261,12 +1221,12 @@ body {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0);
+    box-shadow: 0 10px 30px rgba(0,0,0,0);
   }
 
   .nav-links.active {
     max-height: 400px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   }
 
   .nav-links li {
@@ -1276,27 +1236,16 @@ body {
     animation: slideInLeft 0.3s ease forwards;
   }
 
-  .nav-links.active li:nth-child(1) {
-    animation-delay: 0.1s;
-  }
-
-  .nav-links.active li:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-
-  .nav-links.active li:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-
-  .nav-links.active li:nth-child(4) {
-    animation-delay: 0.4s;
-  }
+  .nav-links.active li:nth-child(1) { animation-delay: 0.1s; }
+  .nav-links.active li:nth-child(2) { animation-delay: 0.2s; }
+  .nav-links.active li:nth-child(3) { animation-delay: 0.3s; }
+  .nav-links.active li:nth-child(4) { animation-delay: 0.4s; }
 
   .nav-links button {
     width: 100%;
     text-align: center;
     padding: 1rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
     border-radius: 0;
   }
 
@@ -1377,7 +1326,6 @@ body {
 
 /* High Performance Animations */
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
@@ -1398,10 +1346,12 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(79, 195, 247, 0.2),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(79, 195, 247, 0.2),
+    transparent
+  );
   animation: shimmer 2s infinite;
 }
 
@@ -1513,7 +1463,7 @@ a:focus-visible {
 
 .fleet-table-container {
   margin-top: 3rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0,0,0,0.2);
   padding: 2rem;
   border-radius: 15px;
   border-top: 2px solid var(--primary-blue);
@@ -1562,13 +1512,8 @@ a:focus-visible {
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .fleet-table {
@@ -1672,13 +1617,10 @@ a:focus-visible {
   border: 1px solid transparent;
   position: relative;
   overflow: hidden;
-  text-decoration: none;
-  /* Hapus underline dari Link */
-  display: inline-flex;
-  /* Agar ikon dan teks sejajar */
+  text-decoration: none; /* Hapus underline dari Link */
+  display: inline-flex; /* Agar ikon dan teks sejajar */
   align-items: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  /* Samakan font */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Samakan font */
 }
 
 .nav-button-style::before {
@@ -1710,37 +1652,29 @@ a:focus-visible {
 .login-button {
   background: linear-gradient(135deg, var(--dark-blue), #0D47A1);
   color: white;
-  padding: 0.9rem 1.5rem;
-  /* Sedikit lebih tinggi */
+  padding: 0.9rem 1.5rem; /* Sedikit lebih tinggi */
   border: none;
-  border-radius: 12px;
-  /* Lebih kotak, tapi tetap rounded */
+  border-radius: 12px; /* Lebih kotak, tapi tetap rounded */
   cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Transisi lebih cepat */
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Transisi lebih cepat */
   width: 100%;
-  margin-top: 1.5rem;
-  /* Jarak lebih besar dari input */
+  margin-top: 1.5rem; /* Jarak lebih besar dari input */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 4px 10px rgba(21, 101, 192, 0.2);
-  /* Shadow awal lebih soft */
-  text-transform: uppercase;
-  /* Agar lebih tegas */
-  letter-spacing: 0.5px;
-  /* Jarak antar huruf */
+  box-shadow: 0 4px 10px rgba(21, 101, 192, 0.2); /* Shadow awal lebih soft */
+  text-transform: uppercase; /* Agar lebih tegas */
+  letter-spacing: 0.5px; /* Jarak antar huruf */
 }
 
 .login-button:hover {
   /* Ganti opacity dengan brightness dan shadow lebih kuat */
-  filter: brightness(1.1);
+  filter: brightness(1.1); 
   box-shadow: 0 6px 20px rgba(21, 101, 192, 0.4);
-  transform: translateY(-2px);
-  /* Efek sedikit terangkat */
+  transform: translateY(-2px); /* Efek sedikit terangkat */
 }
 
 .login-button:active {
@@ -1751,86 +1685,75 @@ a:focus-visible {
 }
 
 .login-button:disabled {
-  opacity: 0.5;
-  /* Opacity lebih rendah untuk disabled */
-  cursor: not-allowed;
-  box-shadow: none;
-  /* Hilangkan shadow saat disabled */
-  transform: translateY(0px);
-  /* Pastikan tidak terangkat saat disabled */
+   opacity: 0.5; /* Opacity lebih rendah untuk disabled */
+   cursor: not-allowed;
+   box-shadow: none; /* Hilangkan shadow saat disabled */
+   transform: translateY(0px); /* Pastikan tidak terangkat saat disabled */
 }
 
 /* Jaga konsistensi jarak ikon */
 .login-button svg {
-  margin-right: 4px;
-  /* Sedikit geser ke kiri */
+  margin-right: 4px; /* Sedikit geser ke kiri */
 }
 
 /* Leaflet Map Customization */
 .leaflet-container {
-  background: #aad3df !important;
-  /* Warna laut default yg lebih soft */
-  font-family: 'Segoe UI', sans-serif;
+    background: #aad3df !important; /* Warna laut default yg lebih soft */
+    font-family: 'Segoe UI', sans-serif;
 }
 
 .leaflet-popup-content-wrapper {
-  border-radius: 10px;
-  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.4);
 }
 
 .leaflet-popup-content strong {
-  color: var(--dark-blue);
-  font-size: 1.1rem;
+    color: var(--dark-blue);
+    font-size: 1.1rem;
 }
 
 /* --- POLISHING DASHBOARD & DETAIL PAGE --- */
 
 /* 1. Latar Belakang Kartu dibuat Putih Solid & Tegas */
 .stat-card {
-  background: #ffffff;
-  /* Putih bersih */
-  border-radius: 16px;
-  /* Sudut membulat modern */
+  background: #ffffff; /* Putih bersih */
+  border-radius: 16px; /* Sudut membulat modern */
   padding: 2rem;
   text-align: center;
-
+  
   /* Shadow yang lembut tapi memberi efek "melayang" (Elevation) */
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05), 
     0 10px 15px -3px rgba(0, 0, 0, 0.05);
-
+  
   /* Border tipis agar batasnya jelas di background biru muda */
-  border: 1px solid rgba(255, 255, 255, 0.5);
-
+  border: 1px solid rgba(255, 255, 255, 0.5); 
+  
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
-  /* Efek naik saat di-hover */
-  box-shadow:
-    0 10px 20px -5px rgba(21, 101, 192, 0.15),
+  transform: translateY(-5px); /* Efek naik saat di-hover */
+  box-shadow: 
+    0 10px 20px -5px rgba(21, 101, 192, 0.15), 
     0 8px 8px -6px rgba(21, 101, 192, 0.1);
-  border-color: var(--primary-blue);
-  /* Border jadi biru saat hover */
+  border-color: var(--primary-blue); /* Border jadi biru saat hover */
 }
 
 /* 2. Ikon: Beri lingkaran background biar ikonnya menonjol */
 .stat-icon {
-  width: 3rem;
+  width: 3rem; 
   height: 3rem;
   margin: 0 auto 1rem;
   padding: 0.6rem;
-
+  
   /* Background lingkaran biru muda transparan */
-  background-color: rgba(79, 195, 247, 0.15);
-  color: var(--dark-blue);
-  /* Warna ikonnya biru tua */
-  border-radius: 50%;
-  /* Membuat jadi bulat */
-
+  background-color: rgba(79, 195, 247, 0.15); 
+  color: var(--dark-blue); /* Warna ikonnya biru tua */
+  border-radius: 50%; /* Membuat jadi bulat */
+  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1839,10 +1762,8 @@ a:focus-visible {
 /* 3. Angka Utama (Value): Dibuat Gelap & Besar */
 .stat-number {
   font-size: 2.5rem;
-  font-weight: 800;
-  /* Lebih tebal */
-  color: #1e293b;
-  /* Slate-900 (Hampir hitam, bukan biru muda) */
+  font-weight: 800; /* Lebih tebal */
+  color: #1e293b; /* Slate-900 (Hampir hitam, bukan biru muda) */
   margin-bottom: 0.5rem;
   letter-spacing: -1px;
 }
@@ -1851,12 +1772,9 @@ a:focus-visible {
 .stat-label {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #64748b;
-  /* Slate-500 (Abu-abu medium, mudah dibaca) */
-  text-transform: uppercase;
-  /* Huruf kapital semua biar rapi */
-  letter-spacing: 0.05em;
-  /* Jarak antar huruf sedikit renggang */
+  color: #64748b; /* Slate-500 (Abu-abu medium, mudah dibaca) */
+  text-transform: uppercase; /* Huruf kapital semua biar rapi */
+  letter-spacing: 0.05em; /* Jarak antar huruf sedikit renggang */
 }
 
 /* 5. Grafik Container: Agar senada dengan kartu */
@@ -1864,8 +1782,8 @@ a:focus-visible {
   background: #ffffff;
   padding: 2rem;
   border-radius: 16px;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05), 
     0 10px 15px -3px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.5);
   margin-top: 2rem;
@@ -1881,7 +1799,6 @@ a:focus-visible {
   align-items: center;
   gap: 0.5rem;
 }
-
 .chart-title::before {
   content: '';
   display: block;
@@ -1893,19 +1810,15 @@ a:focus-visible {
 
 .dark-mode .stat-card,
 .dark-mode .chart-container {
-  background: #1e293b;
-  /* Warna Slate Gelap */
-  border-color: #334155;
-  /* Border abu-abu tua */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-  /* Shadow lebih pekat */
+  background: #1e293b; /* Warna Slate Gelap */
+  border-color: #334155; /* Border abu-abu tua */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5); /* Shadow lebih pekat */
 }
 
 /* 2. Teks Angka & Judul jadi Terang */
 .dark-mode .stat-number,
 .dark-mode .chart-title {
-  color: #f1f5f9;
-  /* Putih tulang */
+  color: #f1f5f9; /* Putih tulang */
 }
 
 /* 3. Label Kecil jadi Abu-abu Terang */
@@ -1915,9 +1828,8 @@ a:focus-visible {
 
 /* 4. Background Ikon jadi lebih transparan */
 .dark-mode .stat-icon {
-  background-color: rgba(79, 195, 247, 0.1);
-  color: #4FC3F7;
-  /* Biru muda neon biar pop-up di gelap */
+  background-color: rgba(79, 195, 247, 0.1); 
+  color: #4FC3F7; /* Biru muda neon biar pop-up di gelap */
 }
 
 /* 5. Tombol Kembali (Back Button) */
@@ -1925,20 +1837,18 @@ a:focus-visible {
   background: none;
   border: none;
   padding: 0;
-  display: flex;
-  align-items: center;
+  display: flex; 
+  align-items: center; 
   gap: 0.5rem;
   font-weight: 500;
   cursor: pointer;
   margin-bottom: 1rem;
-  color: #1565C0;
-  /* Default (Light Mode) */
+  color: #1565C0; /* Default (Light Mode) */
   transition: color 0.3s ease;
 }
 
 .dark-mode .back-btn {
-  color: #60A5FA;
-  /* Biru muda saat dark mode */
+  color: #60A5FA; /* Biru muda saat dark mode */
 }
 
 .back-btn:hover {
@@ -1949,27 +1859,25 @@ a:focus-visible {
 
 .fleet-table-container {
   margin-top: 3rem;
-
+  
   /* Ganti background gelap menjadi Putih dengan nuansa Biru sangat muda */
   background: #ffffff;
   background: linear-gradient(to bottom, #ffffff 0%, #f8fbff 100%);
-
-  padding: 2.5rem;
-  /* Padding sedikit diperbesar agar lega */
-  border-radius: 24px;
-  /* Sudut lebih membulat (modern look) */
-
+  
+  padding: 2.5rem; /* Padding sedikit diperbesar agar lega */
+  border-radius: 24px; /* Sudut lebih membulat (modern look) */
+  
   /* Hapus border-top tebal lama, ganti dengan border halus keliling */
   border: 1px solid rgba(255, 255, 255, 0.8);
-
+  
   /* Shadow biru halus (Elevation effect) */
-  box-shadow:
-    0 10px 40px -10px rgba(21, 101, 192, 0.1),
+  box-shadow: 
+    0 10px 40px -10px rgba(21, 101, 192, 0.1), 
     0 0 0 1px rgba(21, 101, 192, 0.05);
 
   width: 100%;
   position: relative;
-
+  
   /* Animasi masuk tetap sama */
   opacity: 0;
   transform: translateY(30px);
@@ -1983,14 +1891,13 @@ a:focus-visible {
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #f1f5f9;
-  /* Garis pemisah tipis di bawah judul */
+  border-bottom: 1px solid #f1f5f9; /* Garis pemisah tipis di bawah judul */
 }
 
 .fleet-table-header h3 {
   font-size: 1.5rem;
   /* Ubah warna teks jadi Biru Tua/Gelap agar terbaca di background putih */
-  color: #1e293b;
+  color: #1e293b; 
   font-weight: 700;
   letter-spacing: -0.02em;
   display: flex;
@@ -2012,7 +1919,7 @@ a:focus-visible {
   align-items: center;
   gap: 0.5rem;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
 .refresh-button:hover {
@@ -2020,7 +1927,7 @@ a:focus-visible {
   border-color: var(--primary-blue);
   color: var(--primary-blue);
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
 .refresh-button:disabled {
@@ -2035,12 +1942,10 @@ a:focus-visible {
 
 .fleet-table {
   width: 100%;
-  border-collapse: separate;
-  /* Gunakan separate untuk styling border-radius baris */
-  border-spacing: 0;
-  /* Tapi rapatkan jaraknya */
+  border-collapse: separate; /* Gunakan separate untuk styling border-radius baris */
+  border-spacing: 0; /* Tapi rapatkan jaraknya */
   /* Ubah warna teks tabel jadi gelap */
-  color: #334155;
+  color: #334155; 
 }
 
 .fleet-table th {
@@ -2049,8 +1954,7 @@ a:focus-visible {
   font-size: 0.8rem;
   text-transform: uppercase;
   font-weight: 700;
-  color: #94a3b8;
-  /* Abu-abu soft untuk header kolom */
+  color: #94a3b8; /* Abu-abu soft untuk header kolom */
   background: transparent;
   border-bottom: 2px solid #e2e8f0;
 }
@@ -2065,8 +1969,7 @@ a:focus-visible {
 
 /* Efek Hover pada Baris Tabel */
 .fleet-table tbody tr:hover td {
-  background: #f8fafc;
-  /* Highlight baris saat di-hover */
+  background: #f8fafc; /* Highlight baris saat di-hover */
 }
 
 /* Hilangkan border bawah pada baris terakhir */
@@ -2077,7 +1980,7 @@ a:focus-visible {
 /* Link ID Box */
 .fleet-table td a {
   /* Ubah warna link ID agar kontras */
-  color: var(--dark-blue) !important;
+  color: var(--dark-blue) !important; 
   background: #eff6ff;
   padding: 4px 10px;
   border-radius: 6px;
@@ -2095,10 +1998,9 @@ a:focus-visible {
 /* Agar tetap bagus saat user ganti ke mode gelap */
 
 .dark-mode .fleet-table-container {
-  background: #1e293b;
-  /* Slate-800 */
+  background: #1e293b; /* Slate-800 */
   border-color: #334155;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .dark-mode .fleet-table-header h3 {
@@ -2123,124 +2025,61 @@ a:focus-visible {
 }
 
 .dark-mode .fleet-table tbody tr:hover td {
-  background: #0f172a;
-  /* Warna hover lebih gelap */
+  background: #0f172a; /* Warna hover lebih gelap */
 }
 
 .dark-mode .refresh-button {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255,255,255,0.05);
   border-color: #475569;
   color: #cbd5e1;
 }
 
 .dark-mode .refresh-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.1);
   color: white;
 }
-
 /* Notification Toast Styles */
 .animate-enter {
   animation: enter 0.35s ease-out;
 }
-
 .animate-leave {
   animation: leave 0.35s ease-in forwards;
 }
 
 @keyframes enter {
-  0% {
-    opacity: 0;
-    transform: scale(0.9) translateY(20px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
-
 @keyframes leave {
-  0% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-
-  100% {
-    opacity: 0;
-    transform: scale(0.9) translateY(20px);
-  }
+  0% { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(0.9) translateY(20px); }
 }
 
 /* Helper classes untuk custom toast jika tidak pakai Tailwind */
-.bg-white {
-  background-color: white;
-}
+.bg-white { background-color: white; }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+.rounded-lg { border-radius: 0.5rem; }
+.flex { display: flex; }
+.items-start { align-items: flex-start; }
+.p-4 { padding: 1rem; }
+.ml-3 { margin-left: 0.75rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.font-medium { font-weight: 500; }
+.text-gray-900 { color: #111827; }
+.text-gray-500 { color: #6b7280; }
+.text-red-500 { color: #ef4444; }
+.text-red-400 { color: #f87171; }
+.font-bold { font-weight: 700; }
+.text-xs { font-size: 0.75rem; }
+.w-full { width: 100%; }
+.max-w-md { max-width: 28rem; }
+.cursor-pointer { cursor: pointer; }
 
-.shadow-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+/* Pulse animation untuk ikon bahaya */
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
-
-.rounded-lg {
-  border-radius: 0.5rem;
-}
-
-.flex {
-  display: flex;
-}
-
-.items-start {
-  align-items: flex-start;
-}
-
-.p-4 {
-  padding: 1rem;
-}
-
-.ml-3 {
-  margin-left: 0.75rem;
-}
-
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-}
-
-.font-medium {
-  font-weight: 500;
-}
-
-.text-gray-900 {
-  color: #111827;
-}
-
-.text-gray-500 {
-  color: #6b7280;
-}
-
-.text-red-500 {
-  color: #ef4444;
-}
-
-.text-red-400 {
-  color: #f87171;
-}
-
-.font-bold {
-  font-weight: 700;
-}
-
-.text-xs {
-  font-size: 0.75rem;
-}
-
-.w-full {
-  width: 100%;
-}
-
-.max-w-md {
-  max-width: 28rem;
-}
-
-.cursor-pointer {
-  cursor: pointer;
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
 }

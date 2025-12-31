@@ -6,9 +6,9 @@ export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('authToken'));
+  
   const [currentUser, setCurrentUser] = useState(() => {
       try {
-          // Pastikan item ada sebelum parsing
           const storedUser = localStorage.getItem('currentUser');
           return storedUser ? JSON.parse(storedUser) : null;
       } catch {
@@ -16,27 +16,17 @@ export const AuthProvider = ({ children }) => {
       }
   });
 
-  // 👇 HAPUS DEKLARASI STATE isAuthenticated INI
-  /*
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isLoggedIn') === 'true';
-  });
-  */
+  const isAuthenticated = !!authToken;
 
-  // 👇 GUNAKAN DERIVED STATE INI SAJA
-  const isAuthenticated = !!authToken; // true jika authToken ada
-
-  const login = (token, user) => {
-    // Validasi sederhana (jangan simpan jika token/user null/undefined)
-    if (token && user) {
+  const login = (token, userData) => { // Saya ubah param jadi userData biar jelas
+    if (token && userData) {
         localStorage.setItem('authToken', token);
-        localStorage.setItem('currentUser', JSON.stringify(user));
+        localStorage.setItem('currentUser', JSON.stringify(userData));
         setAuthToken(token);
-        setCurrentUser(user);
-        console.log("User logged in with token:", token);
+        setCurrentUser(userData);
+        console.log("Login success. User data saved:", userData); // Debug log
     } else {
-        console.error("Login function called without valid token or user data.");
-        // Mungkin logout untuk membersihkan state jika data tidak valid
+        console.error("Login failed: Missing token or user data");
         logout();
     }
   };
@@ -44,15 +34,22 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('currentUser');
+    
+    // --- TAMBAHAN PENTING: BERSIHKAN DAFTAR SMARTBOX ---
+    localStorage.removeItem('my_smartboxes'); 
+    // ---------------------------------------------------
+
     setAuthToken(null);
     setCurrentUser(null);
-    console.log("User logged out");
+    console.log("User logged out and storage cleared.");
   };
 
+  // --- BAGIAN INI YANG DIPERBAIKI ---
   const value = {
     isAuthenticated,
     authToken,
-    currentUser,
+    currentUser,       // Tetap simpan ini (kalau ada file lain yg pakai)
+    user: currentUser, // <--- TAMBAHAN PENTING: Alias 'currentUser' jadi 'user'
     login,
     logout,
   };

@@ -83,6 +83,19 @@ def initialize_database():
             FOREIGN KEY (user_id) REFERENCES users (id)
         );
         """)
+
+        # 4. Tabel Kepemilikan Box (BARU)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS box_ownership (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            box_id TEXT NOT NULL,
+            label TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            UNIQUE(box_id) 
+        );
+        """)
         
         conn.commit()
         print(f"Database '{DB_FILE}' initialized.")
@@ -96,7 +109,7 @@ def initialize_database():
                 VALUES (?, ?, ?, ?, ?)
             """, ("superadmin", "super@smartbox.id", super_pass, "super_admin", 1))
             conn.commit()
-            print("Super Admin account created (User: superadmin, Pass: password123)")
+            print("Super Admin account created.")
         except sqlite3.IntegrityError:
             pass # Sudah ada, skip
 
@@ -160,11 +173,21 @@ def start_mqtt_listener():
 app = Flask(__name__)
 CORS(app)
 
+# Helper untuk memvalidasi token dan ambil user_id
+def decode_token(auth_header):
+    if not auth_header:
+        return None
+    try:
+        token = auth_header.split(" ")[1] # Format: "Bearer <token>"
+        payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        return payload 
+    except Exception:
+        return None
+
 # --- ENDPOINT DATA UMUM ---
 
 @app.route('/api/data/<string:box_id>', methods=['GET'])
 def get_data_by_box_id(box_id: str):
-    """Mengambil riwayat data sensor untuk satu box tertentu."""
     limit = request.args.get('limit', 100, type=int)
     conn = None
     try:
@@ -181,54 +204,14 @@ def get_data_by_box_id(box_id: str):
     finally:
         if conn: conn.close()
 
-@app.route('/api/data/<string:box_id>/range', methods=['GET'])
-def get_data_by_time_range(box_id: str):
-    """Mengambil data berdasarkan rentang menit terakhir (timestamp-based filtering)."""
-    minutes = request.args.get('minutes', type=int, default=10)
-
-    # Hitung timestamp sejak X menit lalu
-    cutoff = datetime.datetime.utcnow() - datetime.timedelta(minutes=minutes)
-
-    conn = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        cursor.execute(
-            """
-            SELECT * FROM smartbox_data
-            WHERE box_id = ?
-              AND timestamp >= ?
-            ORDER BY timestamp ASC
-            """,
-            (box_id, cutoff.strftime("%Y-%m-%d %H:%M:%S"))
-        )
-
-        rows = cursor.fetchall()
-        data = [dict(row) for row in rows]
-
-        return jsonify(data)
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-    finally:
-        if conn: conn.close()
-
-
 # --- ENDPOINT OTENTIKASI (REGISTER & LOGIN) ---
 
 @app.route('/api/auth/register', methods=['POST'])
 def register_user():
-    """Pendaftaran mitra baru (User + Profil Bisnis)."""
     data = request.get_json()
-    
-    # Data Akun
     username = data.get('username')
     password = data.get('password')
     email = data.get('email', '')
-    
-    # Data Profil Mitra
     business_name = data.get('business_name', '')
     business_type = data.get('business_type', '')
     address = data.get('address', '')
@@ -243,14 +226,12 @@ def register_user():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # 1. Simpan User (Role default 'admin', status 'pending'/0)
         cursor.execute(
             "INSERT INTO users (username, email, password_hash, role, is_approved) VALUES (?, ?, ?, 'admin', 0)",
             (username, email, password_hash)
         )
         user_id = cursor.lastrowid
 
-        # 2. Simpan Profil Mitra
         cursor.execute(
             "INSERT INTO mitra_profiles (user_id, business_name, business_type, address, phone) VALUES (?, ?, ?, ?, ?)",
             (user_id, business_name, business_type, address, phone)
@@ -267,7 +248,6 @@ def register_user():
 
 @app.route('/api/auth/login', methods=['POST'])
 def login_user():
-    """Login user dengan pengecekan status approval."""
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
@@ -281,13 +261,8 @@ def login_user():
 
         if user and check_password_hash(user['password_hash'], password):
             
-            # --- CEK STATUS APPROVAL ---
             if user['is_approved'] == 0:
-                return jsonify({"error": "Akun Anda sedang dalam peninjauan (Pending)."}), 403
-            
-            # --- CEK STATUS REJECTED (LOGIKA BARU) ---
-            if user['is_approved'] == -1:
-                return jsonify({"error": "Mohon maaf, pendaftaran akun Anda telah DITOLAK oleh Admin."}), 403
+                return jsonify({"error": "Akun Anda belum disetujui oleh Super Admin."}), 403
 
             # Generate Token
             token_payload = {
@@ -315,16 +290,97 @@ def login_user():
     finally:
         if conn: conn.close()
 
-# --- ENDPOINT SUPER ADMIN ---
+# --- ENDPOINT MITRA (NEW: BOX REGISTRATION & DASHBOARD) ---
 
-@app.route('/api/admin/users', methods=['GET'])
-def get_pending_users():
-    """Mengambil daftar user yang belum disetujui (is_approved=0)."""
+@app.route('/api/register-box', methods=['POST'])
+def register_box():
+    # 1. Cek Login
+    user_data = decode_token(request.headers.get('Authorization'))
+    if not user_data:
+        return jsonify({"error": "Unauthorized. Please login first."}), 401
+
+    data = request.json
+    box_id = data.get('box_id')
+    label = data.get('label', box_id)
+
+    if not box_id:
+        return jsonify({"error": "Box ID is required"}), 400
+
     conn = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        # Query JOIN untuk mengambil data user + profil bisnisnya
+
+        # 2. Cek apakah box sudah didaftarkan orang lain
+        cursor.execute("SELECT id FROM box_ownership WHERE box_id = ?", (box_id,))
+        existing = cursor.fetchone()
+        
+        if existing:
+            return jsonify({"error": "SmartBox ini sudah terdaftar oleh mitra lain!"}), 409
+
+        # 3. Simpan Kepemilikan
+        cursor.execute(
+            "INSERT INTO box_ownership (user_id, box_id, label) VALUES (?, ?, ?)",
+            (user_data['user_id'], box_id, label)
+        )
+        conn.commit()
+        
+        return jsonify({"message": f"SmartBox {box_id} berhasil didaftarkan!"}), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+@app.route('/api/my-dashboard-data', methods=['GET'])
+def get_my_dashboard_data():
+    # 1. Cek Login
+    user_data = decode_token(request.headers.get('Authorization'))
+    if not user_data:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # 2. Ambil daftar Box ID milik user ini
+        cursor.execute("SELECT box_id, label FROM box_ownership WHERE user_id = ?", (user_data['user_id'],))
+        my_boxes = cursor.fetchall()
+        
+        if not my_boxes:
+            return jsonify([]) # Belum punya box
+
+        # List of box_ids: ['SMARTBOX-001', 'SMARTBOX-002']
+        box_ids = [row['box_id'] for row in my_boxes]
+        
+        # 3. Query data sensor HANYA dari box_ids tersebut
+        placeholders = ','.join('?' for _ in box_ids)
+        query = f"""
+            SELECT * FROM smartbox_data 
+            WHERE box_id IN ({placeholders}) 
+            ORDER BY timestamp DESC 
+            LIMIT 100
+        """
+        
+        cursor.execute(query, tuple(box_ids))
+        sensor_data = [dict(row) for row in cursor.fetchall()]
+
+        return jsonify(sensor_data)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+# --- ENDPOINT SUPER ADMIN ---
+
+@app.route('/api/admin/users', methods=['GET'])
+def get_pending_users():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
         query = """
             SELECT u.id, u.username, u.email, u.created_at, 
                    m.business_name, m.business_type, m.address, m.phone
@@ -342,7 +398,6 @@ def get_pending_users():
 
 @app.route('/api/admin/approve/<int:user_id>', methods=['POST'])
 def approve_user(user_id):
-    """Menyetujui pendaftaran mitra (ubah is_approved jadi 1)."""
     conn = None
     try:
         conn = get_db_connection()
@@ -355,35 +410,14 @@ def approve_user(user_id):
     finally:
         if conn: conn.close()
 
-@app.route('/api/admin/reject/<int:user_id>', methods=['DELETE']) # Tetap DELETE di frontend tidak apa-apa, tapi logic di sini UPDATE
-def reject_user(user_id):
-    """Menolak pendaftaran mitra (Ubah status jadi -1)."""
-    conn = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # JANGAN HAPUS, TAPI UBAH STATUS JADI -1
-        cursor.execute("UPDATE users SET is_approved = -1 WHERE id = ?", (user_id,))
-        
-        conn.commit()
-        return jsonify({"message": f"User ID {user_id} has been rejected."}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        if conn: conn.close()
-
 @app.route('/api/admin/devices', methods=['GET'])
 def get_all_active_devices():
-    """Mengambil SEMUA Box ID yang ada di database (untuk Global Monitoring)."""
     conn = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        # Ambil ID unik dari tabel data sensor
         cursor.execute("SELECT DISTINCT box_id FROM smartbox_data")
         rows = cursor.fetchall()
-        # Convert ke list string sederhana: ["SMARTBOX-001", "SMARTBOX-002"]
         device_ids = [row['box_id'] for row in rows]
         return jsonify(device_ids)
     except Exception as e:
@@ -393,7 +427,6 @@ def get_all_active_devices():
 
 @app.route('/api/export/<string:box_id>', methods=['GET'])
 def export_box_data_csv(box_id):
-    """Generate CSV file dari data sensor box tertentu."""
     conn = None
     try:
         conn = get_db_connection()
@@ -404,36 +437,19 @@ def export_box_data_csv(box_id):
         )
         rows = cursor.fetchall()
 
-        # Fungsi Generator untuk streaming CSV
         def generate():
             data = io.StringIO()
             w = csv.writer(data)
 
             # Tulis Header CSV
-            w.writerow(('Waktu (WIB)', 'Suhu (°C)', 'Kelembapan (%)', 'Latitude', 'Longitude'))
+            w.writerow(('Waktu', 'Suhu (°C)', 'Kelembapan (%)', 'Latitude', 'Longitude'))
             yield data.getvalue()
             data.seek(0)
             data.truncate(0)
 
-            # Tulis Data Baris per Baris
             for row in rows:
-                # --- LOGIKA KONVERSI WAKTU (BARU) ---
-                try:
-                    # 1. Parse string waktu dari database (UTC)
-                    # Format SQLite default: "YYYY-MM-DD HH:MM:SS"
-                    dt_utc = datetime.datetime.strptime(row['timestamp'], "%Y-%m-%d %H:%M:%S")
-                    
-                    # 2. Tambah 7 Jam untuk WIB
-                    dt_wib = dt_utc + datetime.timedelta(hours=7)
-                    
-                    # 3. Format kembali jadi string
-                    final_timestamp = dt_wib.strftime("%Y-%m-%d %H:%M:%S")
-                except Exception:
-                    # Fallback jika format error, pakai data asli
-                    final_timestamp = row['timestamp']
-
                 w.writerow((
-                    final_timestamp,  # Gunakan waktu yang sudah dikonversi
+                    row['timestamp'],
                     row['temperature'],
                     row['humidity'],
                     row['latitude'],
@@ -443,7 +459,6 @@ def export_box_data_csv(box_id):
                 data.seek(0)
                 data.truncate(0)
 
-        # Return sebagai file attachment
         response = Response(stream_with_context(generate()), mimetype='text/csv')
         response.headers.set("Content-Disposition", "attachment", filename=f"{box_id}_report.csv")
         return response
