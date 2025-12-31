@@ -22,4 +22,8 @@ Proyek ini dibagi menjadi tiga komponen utama:
 
 ## Dokumentasi
 
-Dokumentasi persyaratan proyek yang lebih detail dapat ditemukan di folder `/docs`.
+Dokumentasi ini sekaligus menjadi panduan untuk menggunakan Dashboard Smart Box IoT
+- **Landing Page**
+- **Sign-Up untuk Admin Dashboard**
+- **Sign-in ke Admin Dashboard**
+- **
