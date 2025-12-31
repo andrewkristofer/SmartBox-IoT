@@ -30,7 +30,6 @@ function App() {
   const showFooter = location.pathname === "/";
 
   return (
-    <AuthProvider>
     <AuthProvider> {/* AuthProvider membungkus semua */}
       
       {/* 👇 3. Pasang Monitor di sini (Di dalam AuthProvider agar bisa akses user login) */}
@@ -108,5 +107,6 @@ function App() {
     </AuthProvider>
   );
 }
+
 
 export default App;

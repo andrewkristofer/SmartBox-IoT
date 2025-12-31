@@ -2037,6 +2037,7 @@ a:focus-visible {
 .dark-mode .refresh-button:hover {
   background: rgba(255,255,255,0.1);
   color: white;
+}
 /* Notification Toast Styles */
 .animate-enter {
   animation: enter 0.35s ease-out;

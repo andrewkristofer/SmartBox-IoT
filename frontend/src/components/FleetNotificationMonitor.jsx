@@ -9,14 +9,15 @@ import { useTranslation } from 'react-i18next';
 
 // Pastikan file audio ada di folder public
 const ALERT_SOUND_URL = "/alert.mp3"; 
-const FLEET_IDS = ["SMARTBOX-001", "SMARTBOX-002", "SMARTBOX-003"];
+
+// HAPUS array FLEET_IDS hardcoded yang lama.
+// const FLEET_IDS = ["SMARTBOX-001", "SMARTBOX-002", "SMARTBOX-003"]; // <-- INI BIANG KEROKNYA
 
 const FleetNotificationMonitor = () => {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   
-  // PERBAIKAN: Gunakan useRef, bukan useState
-  // Ref nilainya selalu update di dalam setInterval tanpa re-render
+  // Gunakan useRef agar nilainya selalu update di dalam setInterval tanpa re-render
   const activeToastsRef = useRef({}); 
   
   const intervalRef = useRef(null);
@@ -41,7 +42,16 @@ const FleetNotificationMonitor = () => {
     // Jangan lanjut jika tidak login
     if (!isAuthenticated) return;
 
-    for (const boxId of FLEET_IDS) {
+    // --- PERBAIKAN UTAMA: AMBIL DARI LOCAL STORAGE ---
+    // Kita hanya memonitor device yang ada di daftar "my_smartboxes" user ini.
+    const savedDevices = localStorage.getItem("my_smartboxes");
+    const myDevices = savedDevices ? JSON.parse(savedDevices) : [];
+
+    // Jika tidak ada device yang dipantau, berhenti (hemat resource)
+    if (myDevices.length === 0) return;
+
+    // Loop hanya device milik user (bukan hardcoded)
+    for (const boxId of myDevices) {
       try {
         const data = await getSmartBoxData(boxId, 1);
         const latestLog = data[0];
@@ -91,7 +101,7 @@ const FleetNotificationMonitor = () => {
               </div>
             ), {
               duration: Infinity, 
-              position: 'bottom-left',
+              position: 'bottom-left', // Posisi di kiri bawah agar tidak tabrakan sama notif sukses
               id: `danger-${boxId}`,
             });
 
@@ -118,8 +128,7 @@ const FleetNotificationMonitor = () => {
         }
 
       } catch (error) {
-        // Jangan spam console error di production, cukup sekali-sekali
-        // console.error(`Error monitoring ${boxId}`, error);
+        // Silent error agar console tidak penuh
       }
     }
   };
@@ -132,7 +141,7 @@ const FleetNotificationMonitor = () => {
         // Setup Interval
         intervalRef.current = setInterval(() => {
             checkFleets();
-        }, 5000); // Cek lebih sering (5 detik) agar responsif saat kembali Aman
+        }, 5000); // Cek setiap 5 detik
     } else {
         // Jika logout, bersihkan semua
         toast.dismiss(); 

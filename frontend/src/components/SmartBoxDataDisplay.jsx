@@ -205,7 +205,7 @@ const SmartBoxDataDisplay = ({ boxIds }) => {
                   {/* Terakhir Dilihat */}
                   <td>
                     {log?.timestamp
-                      ? new Date(log.timestamp).toLocaleString("id-ID")
+                      ? new Date(log.timestamp.replace(" ", "T") + "Z").toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })
                       : '—'}
                   </td>
 
