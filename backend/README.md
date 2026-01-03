@@ -1,7 +1,5 @@
 # 📦 Smart Box IoT - Backend Service
 
-> **Status:** 🚧 Work in Progress (WIP)
-
 ---
 
 ## 📖 Daftar Isi
@@ -48,6 +46,7 @@ Cara menjalankannya: Buka terminal baru (jangan matikan terminal server backend)
 cd .\backend\
 py .\mqtt_simulator.py
 ```
+
 
 
 
