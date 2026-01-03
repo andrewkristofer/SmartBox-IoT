@@ -34,8 +34,6 @@ npm run dev
 ```
 Web frontend akan aktif melalui localhost.
 
----
-
 
 
 
